@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JobFinder Structure</title>
+  </head>
+  <body>
+    <header>
+      <h1>JobFinder</h1>
+      <button>Menu</button>
+    </header>
+
+    <hr />
+
+    <section>
+      <h3>Search Positions</h3>
+      <input type="text" placeholder="Job title, keywords, or company." />
+
+      <h4>Years of Experience</h4>
+      <input type="range" min="0" max="10" value="5" />
+      <p>Entry (0) --- Mid (5) --- Senior (10+)</p>
+
+      <button>Apply Filters</button>
+
+      <ul>
+        <li>Remote [x]</li>
+        <li>Experience [v]</li>
+        <li>Salary Range [v]</li>
+        <li>Full-time [v]</li>
+      </ul>
+    </section>
+
+    <hr />
+
+    <main>
+      <article>
+        <span>[Icon]</span>
+        <span>Open</span>
+        <h2>Senior Frontend Engineer</h2>
+        <p>TechFlow Solutions - Remote</p>
+        <ul>
+          <li>$140k - $180k / year</li>
+          <li>5+ years experience</li>
+        </ul>
+        <button>View Details</button>
+      </article>
+
+      <br />
+
+      <article>
+        <span>[Icon]</span>
+        <span>Open</span>
+        <h2>UX/UI Design Lead</h2>
+        <p>CreativePixel Agency - New York, NY</p>
+        <ul>
+          <li>$120k - $155k / year</li>
+          <li>7+ years experience</li>
+        </ul>
+        <button>View Details</button>
+      </article>
+
+      <br />
+
+      <article>
+        <span>[Icon]</span>
+        <span>Closed</span>
+        <h2>Data Scientist</h2>
+        <p>Insight Analytics - Austin, TX</p>
+        <ul>
+          <li>$110k - $145k / year</li>
+          <li>3+ years experience</li>
+        </ul>
+        <button disabled>Position Filled</button>
+      </article>
+    </main>
+
+    <hr />
+  </body>
+</html>
