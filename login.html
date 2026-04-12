@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - JobFinder</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" alt="icon">
+        <span>JobFinder</span>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Log in</h1>
+
+    <!-- ✅ ضفنا id هنا بس -->
+    <form id="loginForm" action="homePage.html" method="post">
+        <fieldset>
+            <legend>Enter your email and password</legend>
+
+            <div class="input-group">
+                <label for="user"><strong>Email</strong></label>
+                <input type="email" id="user" name="email" placeholder="example@gmail.com" required>
+            </div>
+
+            <!-- Password with eye -->
+            <div class="input-group">
+                <label for="pass"><strong>Password</strong></label>
+
+                <div class="password-box">
+                    <input type="password" id="pass" name="password" placeholder="********" required>
+
+                    <!-- 👁 toggle -->
+                    <span class="eye" onclick="togglePassword(this)"></span>
+                </div>
+            </div>
+
+            <div class="remember">
+                <input type="checkbox" id="cb" name="remember">
+                <label for="cb">Remember me</label>
+            </div>
+
+            <!-- ✅ مكان رسالة الخطأ -->
+            <p id="errorMsg"></p>
+
+            <!-- ✅ ضفنا id هنا بس -->
+            <input type="submit" id="loginBtn" value="Login">
+
+            <p class="signup">
+                I don't have an account <a href="SignUp.html">Sign Up</a>
+            </p>
+        </fieldset>
+    </form>
+</div>
+
+<footer>
+    <p>privacy policy | terms of service | help center</p>
+</footer>
+
+<script src="login.js"></script>
+</body>
+</html>
