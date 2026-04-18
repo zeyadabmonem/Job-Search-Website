@@ -53,12 +53,15 @@
         card.innerHTML =
           '<div class="app-info">' +
             '<h3>' + job.title + '</h3>' +
+
             '<p class="app-meta">' +
-              job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
-              ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
+              job.company + ' - $' + Number(job.salary).toLocaleString() + ' per month - ' +
+              job.years + '+ years of experience' +
             '</p>' +
+
             (dateStr ? '<p class="app-date">' + dateStr + '</p>' : '') +
           '</div>' +
+
           '<span class="applied-tag">✓ Applied</span>';
 
         container.appendChild(card);
