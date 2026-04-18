@@ -16,63 +16,52 @@
     <div class="container-700">
       <div class="card">
 
-        <!-- Header -->
         <div class="form-header">
-          <div class="form-header-tag">📋 Admin Panel</div>
+          <div class="form-header-tag">Admin Panel</div>
           <h1 class="form-title">Post a New Job</h1>
           <p class="form-subtitle">Fill in the details below to publish a job listing.</p>
         </div>
 
-        <!-- Form body -->
         <div class="form-body" id="form-body">
           <form id="create-job-form" novalidate>
             <div class="form-grid">
 
-              <!-- Job title -->
               <div class="form-group">
                 <label for="jobtitle">Job Title <span class="required-star">*</span></label>
                 <div class="input-icon-wrap">
-                  <span class="field-icon">💼</span>
                   <input type="text" id="jobtitle" name="jobtitle"
                          placeholder="e.g. Senior Frontend Developer" autocomplete="off" />
                 </div>
                 <span class="field-error" id="jobtitle-error">Please enter a job title.</span>
               </div>
 
-              <!-- Company name -->
               <div class="form-group">
                 <label for="company">Company Name <span class="required-star">*</span></label>
                 <div class="input-icon-wrap">
-                  <span class="field-icon">🏢</span>
                   <input type="text" id="company" name="company"
                          placeholder="e.g. Amazon, Google" autocomplete="off" />
                 </div>
                 <span class="field-error" id="company-error">Please enter a company name.</span>
               </div>
 
-              <!-- Salary -->
               <div class="form-group">
                 <label for="salary">Monthly Salary (USD) <span class="required-star">*</span></label>
                 <div class="input-icon-wrap">
-                  <span class="field-icon">💵</span>
                   <input type="number" id="salary" name="salary"
                          placeholder="e.g. 8000" min="0" />
                 </div>
                 <span class="field-error" id="salary-error">Please enter a valid salary.</span>
               </div>
 
-              <!-- Years of experience -->
               <div class="form-group">
                 <label for="years">Years of Experience <span class="required-star">*</span></label>
                 <div class="input-icon-wrap">
-                  <span class="field-icon">📅</span>
                   <input type="number" id="years" name="years"
                          placeholder="e.g. 3" min="0" max="50" />
                 </div>
                 <span class="field-error" id="years-error">Please enter required years of experience.</span>
               </div>
 
-              <!-- Job status -->
               <div class="form-group">
                 <label for="status">Job Status <span class="required-star">*</span></label>
                 <div class="select-wrapper">
@@ -87,7 +76,6 @@
 
               <div class="form-divider"></div>
 
-              <!-- Description -->
               <div class="form-group full">
                 <label for="description">Job Description <span class="required-star">*</span></label>
                 <textarea id="description" name="description" rows="5"
@@ -98,19 +86,12 @@
 
             </div>
 
-            <button type="submit" class="btn-submit">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
-                   viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-              Publish Job Listing
-            </button>
+            <button type="submit" class="btn-submit">Publish Job Listing</button>
           </form>
         </div>
 
-        <!-- Success state -->
-        <div class="success-overlay" id="success-overlay" aria-live="polite">
-          <div class="success-icon">✅</div>
+        <div class="success-overlay" id="success-overlay" >
+          <div class="success-icon">✓</div>
           <h2 class="success-title">Job Published!</h2>
           <p class="success-text">Your listing is now live and visible to candidates.</p>
           <button class="btn btn-outline" onclick="resetForm()" style="margin-top:8px;">
@@ -127,46 +108,39 @@
 
   <script src="storage.js"></script>
   <script>
-    /* Field validation config */
     var fields = [
-      { id:'jobtitle',    errorId:'jobtitle-error',    check: function(v){ return v.trim().length > 0; } },
-      { id:'company',     errorId:'company-error',     check: function(v){ return v.trim().length > 0; } },
-      { id:'salary',      errorId:'salary-error',      check: function(v){ return v.trim() !== '' && Number(v) >= 0; } },
-      { id:'years',       errorId:'years-error',       check: function(v){ return v.trim() !== '' && Number(v) >= 0; } },
-      { id:'status',      errorId:'status-error',      check: function(v){ return v !== ''; } },
-      { id:'description', errorId:'description-error', check: function(v){ return v.trim().length > 0; } }
+      { id: 'jobtitle',    errId: 'jobtitle-error',    valid: function(v) { return v.trim() !== ''; } },
+      { id: 'company',     errId: 'company-error',     valid: function(v) { return v.trim() !== ''; } },
+      { id: 'salary',      errId: 'salary-error',      valid: function(v) { return v.trim() !== '' && Number(v) >= 0; } },
+      { id: 'years',       errId: 'years-error',       valid: function(v) { return v.trim() !== '' && Number(v) >= 0; } },
+      { id: 'status',      errId: 'status-error',      valid: function(v) { return v !== ''; } },
+      { id: 'description', errId: 'description-error', valid: function(v) { return v.trim() !== ''; } }
     ];
 
-    /* Validate a single field and toggle error classes */
-    function validateField(cfg) {
-      var el  = document.getElementById(cfg.id);
-      var err = document.getElementById(cfg.errorId);
-      var ok  = cfg.check(el.value);
+    function checkField(f) {
+      var el  = document.getElementById(f.id);
+      var err = document.getElementById(f.errId);
+      var ok  = f.valid(el.value);
       el.classList.toggle('error', !ok);
       err.classList.toggle('visible', !ok);
       return ok;
     }
 
-    /* Attach blur + live-clear listeners */
-    fields.forEach(function (f) {
+    fields.forEach(function(f) {
       var el = document.getElementById(f.id);
-      el.addEventListener('blur',  function ()  { validateField(f); });
-      el.addEventListener('input', function ()  { if (el.classList.contains('error')) validateField(f); });
+      el.addEventListener('blur',  function() { checkField(f); });
+      el.addEventListener('input', function() { if (el.classList.contains('error')) checkField(f); });
     });
 
-    /* Form submit */
-    document.getElementById('create-job-form').addEventListener('submit', function (e) {
+    document.getElementById('create-job-form').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      var allValid = fields.every(function (f) { return validateField(f); });
+      var ok = fields.every(function(f) { return checkField(f); });
 
-      if (!allValid) {
-        var first = document.querySelector('input.error, select.error, textarea.error');
-        if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+      if (!ok) {
         return;
       }
 
-      /* Build job object */
       var job = {
         id:          Date.now(),
         title:       document.getElementById('jobtitle').value.trim(),
@@ -179,17 +153,15 @@
 
       JobStorage.saveJob(job);
 
-      /* Show success state */
       document.getElementById('form-body').style.display = 'none';
       document.getElementById('success-overlay').classList.add('visible');
     });
 
-    /* Reset to empty form */
     function resetForm() {
       document.getElementById('create-job-form').reset();
-      fields.forEach(function (f) {
+      fields.forEach(function(f) {
         document.getElementById(f.id).classList.remove('error');
-        document.getElementById(f.errorId).classList.remove('visible');
+        document.getElementById(f.errId).classList.remove('visible');
       });
       document.getElementById('success-overlay').classList.remove('visible');
       document.getElementById('form-body').style.display = '';

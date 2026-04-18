@@ -26,28 +26,28 @@
 
   <script src="storage.js"></script>
   <script>
-    var container   = document.getElementById('applied-container');
-    var appliedJobs = JobStorage.getAppliedJobs();
+    var container = document.getElementById('applied-container');
+    var jobs = JobStorage.getAppliedJobs();
 
-    if (appliedJobs.length === 0) {
+    if (jobs.length === 0) {
       container.innerHTML =
         '<div class="empty-state">' +
-          '<div class="empty-state-icon">📋</div>' +
+          '<div class="empty-state-icon"></div>' +
           '<p>No applications yet.</p>' +
           '<p>Browse <a href="jobs.html">available jobs</a> and start applying.</p>' +
         '</div>';
-
-    } else {
-      /* Show most recent first */
-      appliedJobs.slice().reverse().forEach(function (job) {
+    } 
+    else {
+      jobs.slice().reverse().forEach(function(job) {
         var card = document.createElement('div');
         card.className = 'app-card';
 
-        /* Format applied date if available */
         var dateStr = '';
         if (job.appliedAt) {
           var d = new Date(job.appliedAt);
-          dateStr = 'Applied on ' + d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+          dateStr = 'Applied on ' + d.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          });
         }
 
         card.innerHTML =
