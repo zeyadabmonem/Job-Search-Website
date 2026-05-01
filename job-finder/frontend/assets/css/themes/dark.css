@@ -1,0 +1,6 @@
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .navbar,
+html[data-theme="dark"] .input,
+html[data-theme="dark"] .btn-outline {
+  box-shadow: none;
+}

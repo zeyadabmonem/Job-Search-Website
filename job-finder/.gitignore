@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# Django
+staticfiles/
+media/
+local_settings.py
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

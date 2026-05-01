@@ -1,0 +1,5 @@
+.jobs-toolbar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
