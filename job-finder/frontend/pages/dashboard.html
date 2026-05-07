@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobFinder | Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header id="app-navbar"></header>
+    <main class="section">
+      <div class="container stack-md">
+        <h1>Dashboard</h1>
+        <p id="user-info" class="muted"></p>
+
+        <section class="stack-md">
+          <h2>My applications</h2>
+          <div id="my-apps"></div>
+        </section>
+
+        <section id="admin-panel" class="stack-md" hidden>
+          <h2>Create new job</h2>
+          <form id="create-job-form" class="card stack-sm">
+            <input class="input" name="title" placeholder="Job title" required />
+            <input class="input" name="company" placeholder="Company name" required />
+            <input class="input" name="location" placeholder="Location" required />
+            <input class="input" name="type" placeholder="Type (Remote/Full-time/Hybrid)" required />
+            <input class="input" name="salary" placeholder="Salary range" required />
+            <textarea class="input" name="summary" placeholder="Short summary" required></textarea>
+            <button class="btn btn-primary" type="submit">Publish job</button>
+            <p id="create-msg" class="muted"></p>
+          </form>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="../assets/js/pages/dashboard.page.js"></script>
+  </body>
+</html>

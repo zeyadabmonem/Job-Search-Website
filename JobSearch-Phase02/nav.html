@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="nav.css" />
+  </head>
+  <body>
+    <nav>
+      <!-- Logo — always visible -->
+      <a class="logo" href="home.html" target="_top">
+        <div class="logo-icon">
+          <img
+            src="images/logo.png"
+            alt=""
+            onerror="this.parentElement.textContent = 'J'"
+          />
+        </div>
+        Job<span class="logo-accent">Finder</span>
+      </a>
+
+      <ul class="nav-links" id="nav-links"></ul>
+    </nav>
+
+    <script src="storage.js"></script>
+    <script src="nav.js"></script>
+  </body>
+</html>
