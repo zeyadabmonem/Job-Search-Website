@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/register.css" />
+</head>
+<body>
+
+  <div class="register-card">
+
+    <!-- Logo -->
+    <div class="register-logo">
+      <div class="register-logo-icon">
+        <img src="assets/images/logo.png" alt="" onerror="this.parentElement.textContent='J'" />
+      </div>
+      Job<span class="register-logo-accent">Finder</span>
+    </div>
+
+    <h1 class="register-title">Create your account</h1>
+    <p class="register-subtitle">Join JobFinder — find or post jobs in minutes.</p>
+
+    <form id="register-form" novalidate>
+      <div class="register-fields">
+
+        <!-- Role selection -->
+        <div class="form-group">
+          <label>I am a <span class="required-star">*</span></label>
+          <div class="role-toggle">
+            <button type="button" class="role-btn active" data-role="user">👤 Job Seeker</button>
+            <button type="button" class="role-btn"        data-role="admin">🏢 Company Admin</button>
+          </div>
+          <input type="hidden" id="role" value="user" />
+        </div>
+
+        <!-- Full name -->
+        <div class="form-group">
+          <label for="name">Full Name <span class="required-star">*</span></label>
+          <input type="text" id="name" name="name"
+                 placeholder="Ahmed Mohamed" autocomplete="name" />
+          <span class="field-error" id="name-error">Please enter your full name.</span>
+        </div>
+
+        <!-- Company name (admin only) -->
+        <div class="form-group company-field" id="company-field">
+          <label for="company">Company Name <span class="required-star">*</span></label>
+          <input type="text" id="company" name="company"
+                 placeholder="e.g. Google, Amazon" autocomplete="organization" />
+          <span class="field-error" id="company-error">Please enter your company name.</span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email address <span class="required-star">*</span></label>
+          <input type="email" id="email" name="email"
+                 placeholder="you@example.com" autocomplete="email" />
+          <span class="field-error" id="email-error">Please enter a valid email.</span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password <span class="required-star">*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="password" name="password"
+                   placeholder="Min. 6 characters" autocomplete="new-password" />
+            <button type="button" class="eye-btn" id="eye-btn">👁</button>
+          </div>
+          <span class="field-error" id="password-error">Password must be at least 6 characters.</span>
+        </div>
+
+        <!-- Confirm password -->
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password <span class="required-star">*</span></label>
+          <input type="password" id="confirm-password" name="confirm-password"
+                 placeholder="Repeat password" autocomplete="new-password" />
+          <span class="field-error" id="confirm-error">Passwords do not match.</span>
+        </div>
+
+        <p class="error-msg" id="error-msg" aria-live="polite"></p>
+
+        <button type="submit" class="btn-register" id="register-btn">Create Account</button>
+
+      </div>
+    </form>
+
+    <p class="register-footer">
+      Already have an account? <a href="login.html">Sign in</a>
+    </p>
+
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/register.js"></script>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Jobs – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/search.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="page-wrapper">
+    <div class="container-700">
+      <div class="card">
+
+        <!-- Hero -->
+        <div class="search-hero">
+          <div class="search-hero-tag">🔍 Smart Search</div>
+          <h1 class="search-hero-title">Search Jobs</h1>
+          <p class="search-hero-subtitle">Filter by title and experience to find the right match.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="search-body">
+          <form id="search-form" novalidate>
+
+            <div class="search-grid">
+
+              <!-- Job title filter -->
+              <div class="form-group">
+                <label for="search-title">Job Title</label>
+                <div class="input-icon-wrap">
+                  <span class="field-icon">💼</span>
+                  <input type="text" id="search-title" name="search-title"
+                         placeholder="e.g. Frontend Developer" autocomplete="off" />
+                </div>
+                <span class="input-hint">Leave empty to search all titles.</span>
+              </div>
+
+              <!-- Years of experience filter -->
+              <div class="form-group">
+                <label for="search-years">Min. Years of Experience</label>
+                <div class="input-icon-wrap">
+                  <span class="field-icon">📅</span>
+                  <input type="number" id="search-years" name="search-years"
+                         placeholder="e.g. 2" min="0" max="50" />
+                </div>
+                <span class="input-hint">Leave empty to show all levels.</span>
+              </div>
+
+            </div>
+
+            <button type="submit" class="btn-search">
+              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5"
+                   viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6"/>
+                <path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+              </svg>
+              Search Jobs
+            </button>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    document.getElementById('search-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var titleInput = document.getElementById('search-title').value.trim().toLowerCase();
+      var yearsInput = document.getElementById('search-years').value.trim();
+      var yearsNum   = yearsInput !== '' ? Number(yearsInput) : null;
+
+      /* Filter all jobs by title and/or experience */
+      var results = JobStorage.getAllJobs().filter(function (job) {
+        var titleMatch = titleInput === '' || job.title.toLowerCase().includes(titleInput);
+        var yearsMatch = yearsNum === null || job.years >= yearsNum;
+        return titleMatch && yearsMatch;
+      });
+
+      JobStorage.saveSearchAndGo(results);
+    });
+  </script>
+
+</body>
+</html>
+
+
+
+

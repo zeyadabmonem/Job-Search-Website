@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Job – JobFinder Admin</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/create-job.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="page-wrapper">
+    <div class="container-700">
+      <div class="card">
+
+        <div class="form-header">
+          <div class="form-header-tag">Admin Panel</div>
+          <h1 class="form-title">Post a New Job</h1>
+          <p class="form-subtitle">Fill in the details below to publish a job listing.</p>
+        </div>
+
+        <div class="form-body" id="form-body">
+          <form id="create-job-form" novalidate>
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label for="jobtitle">Job Title <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <input type="text" id="jobtitle" name="jobtitle"
+                         placeholder="e.g. Senior Frontend Developer" autocomplete="off" />
+                </div>
+                <span class="field-error" id="jobtitle-error">Please enter a job title.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="company">Company Name <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <input type="text" id="company" name="company"
+                         placeholder="e.g. Amazon, Google" autocomplete="off" />
+                </div>
+                <span class="field-error" id="company-error">Please enter a company name.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="salary">Monthly Salary (USD) <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <input type="number" id="salary" name="salary"
+                         placeholder="e.g. 8000" min="0" />
+                </div>
+                <span class="field-error" id="salary-error">Please enter a valid salary.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="years">Years of Experience <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <input type="number" id="years" name="years"
+                         placeholder="e.g. 3" min="0" max="50" />
+                </div>
+                <span class="field-error" id="years-error">Please enter required years of experience.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="status">Job Status <span class="required-star">*</span></label>
+                <div class="select-wrapper">
+                  <select id="status" name="status">
+                    <option value="">— Select status —</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+                <span class="field-error" id="status-error">Please select a job status.</span>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="form-group full">
+                <label for="description">Job Description <span class="required-star">*</span></label>
+                <textarea id="description" name="description" rows="5"
+                          placeholder="Describe the role, responsibilities, and requirements…"></textarea>
+                <span class="input-hint">Minimum 30 characters recommended.</span>
+                <span class="field-error" id="description-error">Please enter a job description.</span>
+              </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">Publish Job Listing</button>
+          </form>
+        </div>
+
+        <div class="success-overlay" id="success-overlay" >
+          <div class="success-icon">✓</div>
+          <h2 class="success-title">Job Published!</h2>
+          <p class="success-text">Your listing is now live and visible to candidates.</p>
+          <button class="btn btn-outline" onclick="resetForm()" style="margin-top:8px;">
+            + Post Another Job
+          </button>
+          <a href="dashboard.html" class="btn btn-ghost" style="margin-top:4px;" target="_top">
+            Go to Dashboard
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    var fields = [
+      { id: 'jobtitle',    errId: 'jobtitle-error',    valid: function(v) { return v.trim() !== ''; } },
+      { id: 'company',     errId: 'company-error',     valid: function(v) { return v.trim() !== ''; } },
+      { id: 'salary',      errId: 'salary-error',      valid: function(v) { return v.trim() !== '' && Number(v) >= 0; } },
+      { id: 'years',       errId: 'years-error',       valid: function(v) { return v.trim() !== '' && Number(v) >= 0; } },
+      { id: 'status',      errId: 'status-error',      valid: function(v) { return v !== ''; } },
+      { id: 'description', errId: 'description-error', valid: function(v) { return v.trim() !== ''; } }
+    ];
+
+    function checkField(f) {
+      var el  = document.getElementById(f.id);
+      var err = document.getElementById(f.errId);
+      var ok  = f.valid(el.value);
+      el.classList.toggle('error', !ok);
+      err.classList.toggle('visible', !ok);
+      return ok;
+    }
+
+    fields.forEach(function(f) {
+      var el = document.getElementById(f.id);
+      el.addEventListener('blur',  function() { checkField(f); });
+      el.addEventListener('input', function() { if (el.classList.contains('error')) checkField(f); });
+    });
+
+    document.getElementById('create-job-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var ok = fields.every(function(f) { return checkField(f); });
+
+      if (!ok) {
+        return;
+      }
+
+      var job = {
+        id:          Date.now(),
+        title:       document.getElementById('jobtitle').value.trim(),
+        company:     document.getElementById('company').value.trim(),
+        salary:      Number(document.getElementById('salary').value),
+        years:       Number(document.getElementById('years').value),
+        status:      document.getElementById('status').value,
+        description: document.getElementById('description').value.trim()
+      };
+
+      JobStorage.saveJob(job);
+
+      document.getElementById('form-body').style.display = 'none';
+      document.getElementById('success-overlay').classList.add('visible');
+    });
+
+    function resetForm() {
+      document.getElementById('create-job-form').reset();
+      fields.forEach(function(f) {
+        document.getElementById(f.id).classList.remove('error');
+        document.getElementById(f.errId).classList.remove('visible');
+      });
+      document.getElementById('success-overlay').classList.remove('visible');
+      document.getElementById('form-body').style.display = '';
+    }
+  </script>
+
+</body>
+</html>
+
+
+
+

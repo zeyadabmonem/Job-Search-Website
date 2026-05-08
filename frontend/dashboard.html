@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/admin-dashboard.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="dashboard-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link active" target="_top">
+          <img src="assets/images/logo.png" alt="Dashboard" class="sidebar-icon" style="width:20px; height:20px;" /> Dashboard
+        </a>
+        <a href="job-manage.html" class="sidebar-link" target="_top">
+          <img src="assets/images/applied.png" alt="My Jobs" class="sidebar-icon" style="width:20px; height:20px;" /> My Jobs
+        </a>
+        <a href="job-create.html" class="sidebar-link" target="_top">
+          <img src="assets/images/add-job.png" alt="Add Job" class="sidebar-icon" style="width:20px; height:20px;" /> Add Job
+        </a>
+      </nav>
+      <button class="sidebar-link logout" onclick="localStorage.removeItem('jf_user'); window.top.location.href='login.html'">
+        <img src="assets/images/logout.png" alt="Logout" class="sidebar-icon" style="width:20px; height:20px;" /> Logout
+      </button>
+    </aside>
+
+    <!-- ── Main content ── -->
+    <main class="dashboard-main">
+
+      <!-- Page header -->
+      <div class="dashboard-header">
+        <div>
+          <h2>Admin Dashboard</h2>
+          <p>Manage your company listings</p>
+        </div>
+        <a href="job-create.html" class="btn btn-primary" target="_top">
+          + Add New Job
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Total Jobs</span>
+            <div class="stat-icon stat-icon-blue">📋</div>
+          </div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Open Jobs</span>
+            <div class="stat-icon stat-icon-green">✅</div>
+          </div>
+          <div class="stat-value" id="stat-open">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Total Applications</span>
+            <div class="stat-icon stat-icon-purple">👥</div>
+          </div>
+          <div class="stat-value" id="stat-apps">0</div>
+        </div>
+
+      </div>
+
+      <!-- Jobs table -->
+      <div class="table-card">
+
+        <div class="table-header">
+          <h3>Job Listings</h3>
+          <div class="table-search">
+            <span class="table-search-icon">🔍</span>
+            <input type="text" id="table-search" placeholder="Search jobs…" autocomplete="off" />
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>Job Details</th>
+                <th>Status</th>
+                <th>Salary</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="table-footer">
+          <span id="table-info">Showing 0 jobs</span>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Confirm delete dialog (simple) -->
+  <div id="delete-overlay" style="
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:14px; padding:32px; max-width:360px;
+                width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2); text-align:center;">
+      <div style="font-size:2.5rem; margin-bottom:12px;">🗑️</div>
+      <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">Delete this job?</h3>
+      <p style="font-size:0.875rem; color:#64748b; margin-bottom:24px;">
+        This action cannot be undone. The listing will be removed permanently.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn btn-ghost" onclick="closeDelete()">Cancel</button>
+        <button class="btn btn-primary" id="confirm-delete-btn"
+                style="background:#dc2626; box-shadow:none;">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    var allJobs      = JobStorage.getAllJobs();
+    var filteredJobs = allJobs.slice();
+    var deleteTarget = null;
+
+    /* ── Render stats ── */
+    function renderStats() {
+      var jobs  = JobStorage.getAllJobs();
+      var open  = jobs.filter(function(j){ return j.status === 'open'; }).length;
+      var apps  = JobStorage.getAppliedJobs().length;
+      document.getElementById('stat-total').textContent = jobs.length;
+      document.getElementById('stat-open').textContent  = open;
+      document.getElementById('stat-apps').textContent  = apps;
+    }
+
+    /* ── Render table rows ── */
+    function renderTable(jobs) {
+      var tbody = document.getElementById('jobs-tbody');
+      tbody.innerHTML = '';
+
+      if (jobs.length === 0) {
+        tbody.innerHTML =
+          '<tr><td colspan="4">' +
+            '<div class="table-empty">No jobs found.</div>' +
+          '</td></tr>';
+        document.getElementById('table-info').textContent = 'No jobs';
+        return;
+      }
+
+      document.getElementById('table-info').textContent =
+        'Showing ' + jobs.length + ' job' + (jobs.length !== 1 ? 's' : '');
+
+      jobs.forEach(function (job) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' +
+            '<div class="job-cell-title">' + job.title + '</div>' +
+            '<div class="job-cell-meta">' + job.company + ' · ' + job.years + '+ yrs exp</div>' +
+          '</td>' +
+          '<td>' +
+            '<span class="badge badge-' + job.status + '">' +
+              '<span class="badge-dot"></span>' +
+              (job.status === 'open' ? 'Open' : 'Closed') +
+            '</span>' +
+          '</td>' +
+          '<td style="font-weight:600; color:#0f172a;">$' + Number(job.salary).toLocaleString() + '<span style="font-size:0.78rem;font-weight:400;color:#94a3b8;">/mo</span></td>' +
+          '<td>' +
+            '<div class="action-btns">' +
+              '<button class="action-btn action-btn-edit" title="Edit">✏️</button>' +
+              '<button class="action-btn action-btn-delete" title="Delete">🗑️</button>' +
+            '</div>' +
+          '</td>';
+
+        /* Edit — go to create-job with prefilled data (future enhancement) */
+        tr.querySelector('.action-btn-edit').addEventListener('click', function () {
+          alert('Edit feature: coming soon.\nJob ID: ' + job.id);
+        });
+
+        /* Delete — show confirm overlay */
+        tr.querySelector('.action-btn-delete').addEventListener('click', function () {
+          deleteTarget = job.id;
+          document.getElementById('delete-overlay').style.display = 'flex';
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ── Search filter ── */
+    document.getElementById('table-search').addEventListener('input', function () {
+      var q = this.value.trim().toLowerCase();
+      filteredJobs = allJobs.filter(function (j) {
+        return j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q);
+      });
+      renderTable(filteredJobs);
+    });
+
+    /* ── Delete confirm ── */
+    document.getElementById('confirm-delete-btn').addEventListener('click', function () {
+      if (deleteTarget !== null) {
+        JobStorage.deleteJob(deleteTarget);
+        allJobs      = JobStorage.getAllJobs();
+        filteredJobs = allJobs.slice();
+        renderStats();
+        renderTable(filteredJobs);
+      }
+      closeDelete();
+    });
+
+    function closeDelete() {
+      deleteTarget = null;
+      document.getElementById('delete-overlay').style.display = 'none';
+    }
+
+    /* Close overlay clicking outside */
+    document.getElementById('delete-overlay').addEventListener('click', function (e) {
+      if (e.target === this) closeDelete();
+    });
+
+    /* ── Init ── */
+    renderStats();
+    renderTable(allJobs);
+  </script>
+
+</body>
+</html>
+
+
+
+

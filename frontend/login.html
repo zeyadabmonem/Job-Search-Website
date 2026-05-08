@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/login.css" />
+</head>
+<body>
+
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <img src="assets/images/logo.png" alt="" onerror="this.parentElement.textContent='J'" />
+      </div>
+      Job<span class="login-logo-accent">Finder</span>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-subtitle">Sign in to your account to continue.</p>
+
+    <!-- Form -->
+    <form id="login-form" novalidate>
+      <div class="login-fields">
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email address <span class="required-star">*</span></label>
+          <input type="email" id="email" name="email"
+                 placeholder="you@example.com" autocomplete="email" />
+          <span class="field-error" id="email-error">Please enter a valid email.</span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password <span class="required-star">*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="password" name="password"
+                   placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="eye-btn" id="eye-btn" aria-label="Toggle password">
+              👁
+            </button>
+          </div>
+          <span class="field-error" id="password-error">Password must be at least 6 characters.</span>
+        </div>
+
+        <!-- Remember me -->
+        <div class="remember-row">
+          <input type="checkbox" id="remember" name="remember" />
+          <label for="remember">Remember me</label>
+        </div>
+
+        <!-- Error message area -->
+        <p class="error-msg" id="error-msg" aria-live="polite"></p>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-login" id="login-btn">Login</button>
+
+      </div>
+    </form>
+
+    <!-- Sign-up link -->
+    <p class="login-footer">
+      Don't have an account? <a href="register.html">Create one</a>
+    </p>
+
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/login.js"></script>
+
+</body>
+</html>
+
+
+
+
