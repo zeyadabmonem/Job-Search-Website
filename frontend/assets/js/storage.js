@@ -17,14 +17,22 @@ var JobStorage = (function () {
     selected: 'jf_selected',
     applied:  'jf_applied',
     user:     'jf_user',
-    search:   'jf_search'
+    search:   'jf_search',
+    token:    'jf_token'
   };
 
   var memStorage = {};
 
   /* ── Helpers ───────────────────────────────────────────── */
-  function load(key)        { return memStorage[key] || null; }
-  function save(key, value) { memStorage[key] = value; }
+  function load(key) {
+    var val = sessionStorage.getItem(key);
+    try { return val ? JSON.parse(val) : null; }
+    catch (e) { return val; }
+  }
+  function save(key, value) {
+    if (typeof value === 'object') sessionStorage.setItem(key, JSON.stringify(value));
+    else sessionStorage.setItem(key, value);
+  }
 
   /* Navigate in the top-level window (works both inside iframe and in normal pages) */
   function navigate(url) {
@@ -91,8 +99,12 @@ var JobStorage = (function () {
 
   function getUser() { return load(KEYS.user); }
 
+  function setToken(token) { save(KEYS.token, token); }
+  function getToken() { return load(KEYS.token); }
+
   function logout() {
-    delete memStorage[KEYS.user];
+    sessionStorage.removeItem(KEYS.user);
+    sessionStorage.removeItem(KEYS.token);
     navigate('login.html');
   }
 
@@ -124,6 +136,8 @@ var JobStorage = (function () {
     hasApplied:        hasApplied,
     setUser:           setUser,
     getUser:           getUser,
+    setToken:          setToken,
+    getToken:          getToken,
     logout:            logout,
     isAdmin:           isAdmin,
     saveSearchAndGo:   saveSearchAndGo,

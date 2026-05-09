@@ -19,6 +19,8 @@ This document outlines the specific responsibilities for all 6 team members duri
   3. Implement **Registration & Login** APIs using JWT or Session-based auth.
   4. Design **Permissions**: Ensure only Admins can post jobs, while Seekers can apply.
   5. **Profile API**: Create an endpoint for users to view/edit their own profile details.
+  -- mazen (3,5)   --> 1.register&login JWT && session-based auth  2. profile API for users(admin/seeker)  -- 
+  
 
 ### Pair 2: Job Listing & Search Logic
 **Members: [Member 3] & [Member 4]** jamal osos 

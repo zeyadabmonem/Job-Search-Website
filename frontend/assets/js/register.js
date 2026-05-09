@@ -99,27 +99,67 @@ form.addEventListener('submit', function (e) {
     return;
   }
 
-  var users = window.jf_users || [];
-  if (users.some(function (u) { return u.email === email; })) {
-    errorMsg.textContent = 'An account with this email already exists.';
-    return;
-  }
+  /* Prepare data for backend API */
+  var payload = {
+    name: name,
+    email: email,
+    password: pass,
+    role: role
+  };
+  if (role === 'admin') payload.company = company;
 
-  /* Save new user */
-  var newUser = { name: name, email: email, password: pass, role: role };
-  if (role === 'admin') newUser.company = company;
-  users.push(newUser);
-  window.jf_users = users;
+  registerBtn.textContent = 'Registering…';
+  registerBtn.disabled = true;
 
-  /* Auto-login and redirect */
-  JobStorage.setUser({ name: name, email: email, role: role });
-
-  registerBtn.textContent = 'Success! Redirecting…';
-  registerBtn.disabled    = true;
-
-  setTimeout(function () {
-    window.top.location.href = role === 'admin' ? 'dashboard.html' : 'index.html';
-  }, 600);
+  fetch('http://127.0.0.1:8000/api/auth/register/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(res) {
+    if (!res.ok) {
+      return res.json().then(function(err) { throw err; });
+    }
+    return res.json();
+  })
+  .then(function(data) {
+    /* Auto-login after registration */
+    return fetch('http://127.0.0.1:8000/api/auth/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    });
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Auto-login failed.');
+    return res.json();
+  })
+  .then(function(data) {
+    /* Save token and user info */
+    JobStorage.setToken(data.access);
+    JobStorage.setUser({
+      name: name,
+      email: email,
+      role: role,
+      company: company
+    });
+    
+    registerBtn.textContent = 'Success! Redirecting…';
+    setTimeout(function () {
+      window.top.location.href = role === 'admin' ? 'dashboard.html' : 'index.html';
+    }, 600);
+  })
+  .catch(function(err) {
+    console.error(err);
+    var errorText = 'Registration failed.';
+    if (err.email) errorText = 'Email: ' + err.email[0];
+    else if (err.password) errorText = 'Password: ' + err.password[0];
+    else if (err.message) errorText = err.message;
+    
+    errorMsg.textContent = errorText;
+    registerBtn.textContent = 'Create Account';
+    registerBtn.disabled = false;
+  });
 });
 
 
