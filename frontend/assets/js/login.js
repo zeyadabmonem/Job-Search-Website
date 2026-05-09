@@ -9,14 +9,6 @@ var errorMsg  = document.getElementById('error-msg');
 var loginBtn  = document.getElementById('login-btn');
 var rememberEl= document.getElementById('remember');
 
-/* ── Auto-fill remembered email ────────────────────────────── */
-window.addEventListener('load', function () {
-  var saved = localStorage.getItem('jf_remember_email');
-  if (saved) {
-    emailEl.value = saved;
-    rememberEl.checked = true;
-  }
-});
 
 /* ── Password visibility toggle ────────────────────────────── */
 eyeBtn.addEventListener('click', function () {
@@ -65,12 +57,6 @@ form.addEventListener('submit', function (e) {
     return;
   }
 
-  /* Remember-me handling */
-  if (rememberEl.checked) {
-    localStorage.setItem('jf_remember_email', email);
-  } else {
-    localStorage.removeItem('jf_remember_email');
-  }
 
   /* Loading state */
   loginBtn.textContent = 'Signing in…';
@@ -78,11 +64,11 @@ form.addEventListener('submit', function (e) {
 
   /*
    * In a real app this would be an API call.
-   * For now: demo users stored in localStorage at registration,
+   * For now: demo users stored in memory at registration,
    * or fall back to a hard-coded demo admin account.
    */
   setTimeout(function () {
-    var users = JSON.parse(localStorage.getItem('jf_users') || '[]');
+    var users = window.jf_users || [];
     var match = users.find(function (u) {
       return u.email === email && u.password === pass;
     });

@@ -91,7 +91,7 @@
                 Search Jobs
               </a>
               <button class="btn btn-ghost" style="color:#ef4444; border-color:#fecaca;"
-                      onclick="localStorage.removeItem('jf_user'); window.location.href='login.html'">
+                      onclick="if(window.JobStorage) JobStorage.logout(); else { window.location.href='login.html'; }">
                 Logout
               </button>
             </div>

@@ -35,8 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     a.addEventListener("click", function (e) {
       e.preventDefault();
-      localStorage.removeItem("jf_user");
-      window.top.location.href = "login.html";
+      JobStorage.logout();
     });
 
     li.appendChild(a);

@@ -27,7 +27,7 @@
           <img src="assets/images/add-job.png" alt="Add Job" class="sidebar-icon" style="width:20px; height:20px;" /> Add Job
         </a>
       </nav>
-      <button class="sidebar-link logout" onclick="localStorage.removeItem('jf_user'); window.top.location.href='login.html'">
+      <button class="sidebar-link logout" onclick="if(window.JobStorage) JobStorage.logout(); else { window.top.location.href='login.html'; }">
         <img src="assets/images/logout.png" alt="Logout" class="sidebar-icon" style="width:20px; height:20px;" /> Logout
       </button>
     </aside>
