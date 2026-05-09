@@ -1,8 +1,7 @@
 /**
  * storage.js — Shared data layer for all pages
- * All pages use these functions only; no page writes to localStorage directly.
+ * All pages use these functions only.
  *
- * localStorage keys:
  *   "jf_jobs"        — array of all jobs created by admin
  *   "jf_selected"    — the job the user clicked to view details
  *   "jf_applied"     — array of jobs the user has applied to
@@ -21,9 +20,11 @@ var JobStorage = (function () {
     search:   'jf_search'
   };
 
+  var memStorage = {};
+
   /* ── Helpers ───────────────────────────────────────────── */
-  function load(key)        { try { var s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch(e) { return null; } }
-  function save(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
+  function load(key)        { return memStorage[key] || null; }
+  function save(key, value) { memStorage[key] = value; }
 
   /* Navigate in the top-level window (works both inside iframe and in normal pages) */
   function navigate(url) {
@@ -64,7 +65,7 @@ var JobStorage = (function () {
 
   function getSelectedJob() { return load(KEYS.selected); }
 
-  function clearSelectedJob() { localStorage.removeItem(KEYS.selected); }
+  function clearSelectedJob() { delete memStorage[KEYS.selected]; }
 
   /* ── Applied Jobs ──────────────────────────────────────── */
 
@@ -91,7 +92,7 @@ var JobStorage = (function () {
   function getUser() { return load(KEYS.user); }
 
   function logout() {
-    localStorage.removeItem(KEYS.user);
+    delete memStorage[KEYS.user];
     navigate('login.html');
   }
 

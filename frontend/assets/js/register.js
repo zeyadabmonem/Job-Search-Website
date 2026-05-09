@@ -33,10 +33,10 @@ roleBtns.forEach(function (btn) {
 eyeBtn.addEventListener('click', function () {
   if (passEl.type === 'password') {
     passEl.type = 'text';
-    eyeBtn.textContent = '🙈';
+    eyeBtn.textContent = '';
   } else {
     passEl.type = 'password';
-    eyeBtn.textContent = '👁';
+    eyeBtn.textContent = '';
   }
 });
 
@@ -99,8 +99,7 @@ form.addEventListener('submit', function (e) {
     return;
   }
 
-  /* Check if email already exists */
-  var users = JSON.parse(localStorage.getItem('jf_users') || '[]');
+  var users = window.jf_users || [];
   if (users.some(function (u) { return u.email === email; })) {
     errorMsg.textContent = 'An account with this email already exists.';
     return;
@@ -110,7 +109,7 @@ form.addEventListener('submit', function (e) {
   var newUser = { name: name, email: email, password: pass, role: role };
   if (role === 'admin') newUser.company = company;
   users.push(newUser);
-  localStorage.setItem('jf_users', JSON.stringify(users));
+  window.jf_users = users;
 
   /* Auto-login and redirect */
   JobStorage.setUser({ name: name, email: email, role: role });

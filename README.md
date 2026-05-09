@@ -2,7 +2,7 @@
 
 This project is a Job Search platform built with a Vanilla JS/HTML/CSS frontend and a Django backend.
 
-## 📂 Repository Structure
+## Repository Structure
 
 - **`/frontend`**: Contains the static website files.
   - `index.html`: Entry point.
@@ -12,7 +12,7 @@ This project is a Job Search platform built with a Vanilla JS/HTML/CSS frontend 
   - `manage.py`: Django management script.
 - **`PROJECT_GUIDE.md`**: Detailed instructions for the team and backend setup.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Frontend
 To view the frontend, open `frontend/index.html` in any web browser.
@@ -22,7 +22,7 @@ To view the frontend, open `frontend/index.html` in any web browser.
 2. Activate the virtual environment.
 3. Run `python manage.py runserver`.
 
-## 👥 Team
+## Team
 - 6 Members
 - Lead: [User]
 - Workflow: Feature branching with Pull Requests.

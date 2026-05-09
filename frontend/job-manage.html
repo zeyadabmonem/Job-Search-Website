@@ -50,7 +50,7 @@
     z-index:1000; align-items:center; justify-content:center;">
     <div style="background:#fff; border-radius:14px; padding:32px; max-width:360px;
                 width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2); text-align:center;">
-      <div style="font-size:2.5rem; margin-bottom:12px;">🗑️</div>
+      <div style="font-size:2.5rem; margin-bottom:12px;"></div>
       <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">Delete this job?</h3>
       <p style="font-size:0.875rem; color:#64748b; margin-bottom:24px;">
         This action cannot be undone.
@@ -75,7 +75,7 @@
       if (jobs.length === 0) {
         container.innerHTML =
           '<div class="empty-state">' +
-            '<div class="empty-state-icon">💼</div>' +
+            '<div class="empty-state-icon"></div>' +
             '<p>No jobs posted yet.</p>' +
             '<p><a href="job-create.html" target="_top">Post your first job listing</a>.</p>' +
           '</div>';
@@ -99,7 +99,7 @@
           '</div>' +
           '<div class="job-actions">' +
             '<button class="btn-view">View Details →</button>' +
-            '<button class="btn-delete">🗑 Delete</button>' +
+            '<button class="btn-delete">Delete</button>' +
           '</div>';
 
         card.querySelector('.btn-view').addEventListener('click', function () {

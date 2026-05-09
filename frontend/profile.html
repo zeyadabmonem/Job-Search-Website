@@ -35,7 +35,7 @@
             <h2 class="section-title">Account Information</h2>
 
             <div class="info-row">
-              <span class="info-row-icon">👤</span>
+              <span class="info-row-icon"></span>
               <div>
                 <div class="info-row-label">Full Name</div>
                 <div class="info-row-value" id="info-name">—</div>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="info-row">
-              <span class="info-row-icon">✉️</span>
+              <span class="info-row-icon"></span>
               <div>
                 <div class="info-row-label">Email Address</div>
                 <div class="info-row-value" id="info-email">—</div>
@@ -51,7 +51,7 @@
             </div>
 
             <div class="info-row">
-              <span class="info-row-icon">🏷️</span>
+              <span class="info-row-icon"></span>
               <div>
                 <div class="info-row-label">Account Role</div>
                 <div class="info-row-value" id="info-role">—</div>
@@ -59,7 +59,7 @@
             </div>
 
             <div class="info-row" id="info-company-row" style="display:none;">
-              <span class="info-row-icon">🏢</span>
+              <span class="info-row-icon"></span>
               <div>
                 <div class="info-row-label">Company</div>
                 <div class="info-row-value" id="info-company">—</div>
@@ -72,7 +72,7 @@
             <h2 class="section-title">Activity</h2>
 
             <div class="info-row">
-              <span class="info-row-icon">📋</span>
+              <span class="info-row-icon"></span>
               <div>
                 <div class="info-row-label">Jobs Applied</div>
                 <div class="info-row-value" id="info-applied">0</div>
@@ -85,14 +85,14 @@
             <h2 class="section-title">Quick Actions</h2>
             <div class="profile-actions">
               <a href="applications.html" class="btn btn-outline" id="view-apps-btn">
-                📋 My Applications
+                My Applications
               </a>
               <a href="search.html" class="btn btn-ghost" id="search-btn">
-                🔍 Search Jobs
+                Search Jobs
               </a>
               <button class="btn btn-ghost" style="color:#ef4444; border-color:#fecaca;"
-                      onclick="localStorage.removeItem('jf_user'); window.location.href='login.html'">
-                🚪 Logout
+                      onclick="if(window.JobStorage) JobStorage.logout(); else { window.location.href='login.html'; }">
+                Logout
               </button>
             </div>
           </div>
@@ -102,7 +102,7 @@
 
       <!-- Not logged in fallback -->
       <div id="no-user-msg" style="display:none; text-align:center; padding:80px 20px;">
-        <div style="font-size:3rem; margin-bottom:16px; opacity:0.4;">🔒</div>
+        <div style="font-size:3rem; margin-bottom:16px; opacity:0.4;"></div>
         <p style="font-size:1.1rem; color:#64748b; margin-bottom:8px;">You are not logged in.</p>
         <a href="login.html" class="btn btn-primary" style="margin-top:12px;">Go to Login</a>
       </div>
@@ -123,7 +123,7 @@
       document.getElementById('profile-name').textContent   = user.name || 'User';
       document.getElementById('profile-email').textContent  = user.email;
 
-      var roleLabel = user.role === 'admin' ? '🏢 Company Admin' : '👤 Job Seeker';
+      var roleLabel = user.role === 'admin' ? 'Company Admin' : 'Job Seeker';
       document.getElementById('profile-role-badge').textContent = roleLabel;
 
       /* Fill info rows */
@@ -142,9 +142,9 @@
       /* Adjust quick actions for admin */
       if (user.role === 'admin') {
         document.getElementById('view-apps-btn').href        = 'job-manage.html';
-        document.getElementById('view-apps-btn').textContent = '💼 My Jobs';
+        document.getElementById('view-apps-btn').textContent = 'My Jobs';
         document.getElementById('search-btn').href           = 'job-create.html';
-        document.getElementById('search-btn').textContent    = '➕ Add Job';
+        document.getElementById('search-btn').textContent    = 'Add Job';
       }
     }
   </script>
