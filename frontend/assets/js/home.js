@@ -13,7 +13,7 @@ var recent = jobs.slice(-3).reverse();
 if (recent.length === 0) {
   container.innerHTML =
     '<div class="empty-state">' +
-    '<div class="empty-state-icon">💼</div>' +
+    '<div class="empty-state-icon"></div>' +
     "<p>No jobs posted yet.</p>" +
     "</div>";
 } else {

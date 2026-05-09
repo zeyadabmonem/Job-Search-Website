@@ -45,10 +45,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ===== ADMIN ===== */
   if (user && user.role === "admin") {
-    list.appendChild(navItem("dashboard.html", "📊 Dashboard"));
-    list.appendChild(navItem("job-manage.html", "💼 My Jobs"));
-    list.appendChild(navItem("job-create.html", "➕ Add Job"));
-    list.appendChild(navItem("profile.html", "👤 Profile"));
+    list.appendChild(navItem("dashboard.html", "Dashboard"));
+    list.appendChild(navItem("job-manage.html", "My Jobs"));
+    list.appendChild(navItem("job-create.html", "Add Job"));
+    list.appendChild(navItem("profile.html", "Profile"));
 
     var chipLi = document.createElement("li");
     var chip = document.createElement("div");
@@ -67,11 +67,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* ===== USER ===== */
   } else if (user) {
-    list.appendChild(navItem("index.html", "🏠 Home"));
-    list.appendChild(navItem("jobs.html", "💼 Jobs"));
-    list.appendChild(navItem("search.html", "🔍 Search"));
-    list.appendChild(navItem("applications.html", "📋 My Applications"));
-    list.appendChild(navItem("profile.html", "👤 Profile"));
+    list.appendChild(navItem("index.html", "Home"));
+    list.appendChild(navItem("jobs.html", "Jobs"));
+    list.appendChild(navItem("search.html", "Search"));
+    list.appendChild(navItem("applications.html", "My Applications"));
+    list.appendChild(navItem("profile.html", "Profile"));
 
     var chipLi2 = document.createElement("li");
     var chip2 = document.createElement("div");

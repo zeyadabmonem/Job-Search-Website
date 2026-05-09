@@ -1,16 +1,16 @@
-# 🚀 JobFinder Backend: Team Work Plan
+# JobFinder Backend: Team Work Plan
 
 This document outlines the specific responsibilities for all 6 team members during the Django backend implementation.
 
-## 📁 Repository Structure
+## Repository Structure
 - **/frontend**: Static UI files (HTML, CSS, JS).
 - **/backend**: Django project and API logic.
 
 ---
 
-## 👥 Member Assignments & Detailed Tasks
+## Member Assignments & Detailed Tasks
 
-### 🔐 Pair 1: Authentication & User Management
+### Pair 1: Authentication & User Management
 **Members: [Member 1 - Team Lead] & [Member 2]**
 - **Objective**: Handle security, login, and user roles.
 - **Tasks**:
@@ -20,7 +20,7 @@ This document outlines the specific responsibilities for all 6 team members duri
   4. Design **Permissions**: Ensure only Admins can post jobs, while Seekers can apply.
   5. **Profile API**: Create an endpoint for users to view/edit their own profile details.
 
-### 💼 Pair 2: Job Listing & Search Logic
+### Pair 2: Job Listing & Search Logic
 **Members: [Member 3] & [Member 4]**
 - **Objective**: Manage the job database and search functionality.
 - **Tasks**:
@@ -32,7 +32,7 @@ This document outlines the specific responsibilities for all 6 team members duri
      - `DELETE /api/jobs/<id>/`: Remove a listing.
   3. **Search & Filter**: Add query parameters to filter jobs by title, company, or salary range.
 
-### 📋 Pair 3: Applications & Admin Dashboard
+### Pair 3: Applications & Admin Dashboard
 **Members: [Member 5] & [Member 6]**
 - **Objective**: Handle job applications and company statistics.
 - **Tasks**:
@@ -46,12 +46,12 @@ This document outlines the specific responsibilities for all 6 team members duri
 
 ---
 
-## 🌿 Professional Workflow
+## Professional Workflow
 - **Branching**: All work must happen on branches named `feature/member-name-task`.
 - **Commits**: Use clear messages like `feat: added job model` or `fix: login validation`.
 - **Reviews**: Once a task is done, open a Pull Request (PR) for the Team Lead to review.
 
-## 🛠️ Quick Start (Backend)
+## Quick Start (Backend)
 ```powershell
 cd backend
 .\venv\Scripts\activate

@@ -33,10 +33,10 @@ roleBtns.forEach(function (btn) {
 eyeBtn.addEventListener('click', function () {
   if (passEl.type === 'password') {
     passEl.type = 'text';
-    eyeBtn.textContent = '🙈';
+    eyeBtn.textContent = '';
   } else {
     passEl.type = 'password';
-    eyeBtn.textContent = '👁';
+    eyeBtn.textContent = '';
   }
 });
 
