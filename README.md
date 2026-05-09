@@ -24,5 +24,5 @@ To view the frontend, open `frontend/index.html` in any web browser.
 
 ## Team
 - 6 Members
-- Lead: [User]
+- Lead: zeyad abdelmonem
 - Workflow: Feature branching with Pull Requests.
