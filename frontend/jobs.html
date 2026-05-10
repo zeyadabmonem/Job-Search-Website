@@ -28,45 +28,53 @@
   <script src="assets/js/storage.js"></script>
   <script>
     var container = document.getElementById('jobs-container');
-    var jobs      = JobStorage.getAllJobs();
+    var countEl = document.getElementById('jobs-count');
 
-    /* Update count pill */
-    document.getElementById('jobs-count').textContent =
-      jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
+    // Fetch jobs from backend
+    fetch('http://localhost:8000/api/jobs/')
+      .then(response => response.json())
+      .then(jobs => {
+        /* Update count pill */
+        countEl.textContent = jobs.length + (jobs.length === 1 ? ' job' : ' jobs');
 
-    if (jobs.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state">' +
-          '<div class="empty-state-icon"></div>' +
-          '<p>No jobs posted yet.</p>' +
-          '<p>Check back soon or <a href="search.html">search for specific roles</a>.</p>' +
-        '</div>';
-    } else {
-      jobs.forEach(function (job) {
-        var card = document.createElement('div');
-        card.className = 'job-card';
-        card.innerHTML =
-          '<div class="job-info">' +
-            '<h3>' + job.title + '</h3>' +
-            '<p class="job-meta">' +
-              job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
-              ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
-            '</p>' +
-            '<span class="badge badge-' + job.status + '">' +
-              '<span class="badge-dot"></span>' +
-              (job.status === 'open' ? 'Open' : 'Closed') +
-            '</span>' +
-          '</div>' +
-          '<button class="btn-view">View Details →</button>';
+        if (jobs.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">' +
+              '<div class="empty-state-icon"></div>' +
+              '<p>No jobs posted yet.</p>' +
+              '<p>Check back soon or <a href="search.html">search for specific roles</a>.</p>' +
+            '</div>';
+        } else {
+          jobs.forEach(function (job) {
+            var card = document.createElement('div');
+            card.className = 'job-card';
+            card.innerHTML =
+              '<div class="job-info">' +
+                '<h3>' + job.title + '</h3>' +
+                '<p class="job-meta">' +
+                  job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
+                  ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
+                '</p>' +
+                '<span class="badge badge-' + job.status.toLowerCase() + '">' +
+                  '<span class="badge-dot"></span>' +
+                  (job.status.toLowerCase() === 'open' ? 'Open' : 'Closed') +
+                '</span>' +
+              '</div>' +
+              '<button class="btn-view">View Details →</button>';
 
-        /* Navigate to job details on button click */
-        card.querySelector('.btn-view').addEventListener('click', function () {
-          JobStorage.selectJob(job);
-        });
+            /* Navigate to job details on button click */
+            card.querySelector('.btn-view').addEventListener('click', function () {
+              window.location.href = 'job-details.html?id=' + job.id;
+            });
 
-        container.appendChild(card);
+            container.appendChild(card);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching jobs:', error);
+        container.innerHTML = '<div class="empty-state"><p>Error loading jobs. Ensure backend is running.</p></div>';
       });
-    }
   </script>
 
 </body>

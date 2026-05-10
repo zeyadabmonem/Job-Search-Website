@@ -104,37 +104,52 @@
 
   <script src="assets/js/storage.js"></script>
   <script>
-    var job = JobStorage.getSelectedJob();
+    var params = new URLSearchParams(window.location.search);
+    var jobId = params.get('id');
+    var job = null; // Store it globally for the apply button
 
-    if (!job) {
+    if (!jobId) {
       document.getElementById('job-card').style.display   = 'none';
       document.getElementById('no-job-msg').style.display = 'block';
-
     } else {
-      /* Fill in details */
-      document.getElementById('detail-title').textContent       = job.title;
-      document.getElementById('detail-company').textContent     = job.company;
-      document.getElementById('detail-salary').textContent      = '$' + Number(job.salary).toLocaleString();
-      document.getElementById('detail-description').textContent = job.description;
+      fetch('http://localhost:8000/api/jobs/' + jobId + '/')
+        .then(response => {
+          if (!response.ok) throw new Error('Job not found');
+          return response.json();
+        })
+        .then(data => {
+          job = data;
+          /* Fill in details */
+          document.getElementById('detail-title').textContent       = job.title;
+          document.getElementById('detail-company').textContent     = job.company;
+          document.getElementById('detail-salary').textContent      = '$' + Number(job.salary).toLocaleString();
+          document.getElementById('detail-description').textContent = job.description;
 
-      /* Status badge */
-      var badge = document.getElementById('status-badge');
-      var text  = document.getElementById('status-text');
-      badge.classList.add(job.status === 'open' ? 'badge-open' : 'badge-closed');
-      text.textContent = job.status === 'open' ? 'Open' : 'Closed';
+          /* Status badge */
+          var badge = document.getElementById('status-badge');
+          var text  = document.getElementById('status-text');
+          badge.classList.add(job.status && job.status.toLowerCase() === 'open' ? 'badge-open' : 'badge-closed');
+          text.textContent = job.status && job.status.toLowerCase() === 'open' ? 'Open' : 'Closed';
 
-      /* Requirements list */
-      var list = document.getElementById('requirements-list');
-      if (job.years) {
-        var li = document.createElement('li');
-        li.innerHTML = '<span class="req-icon"></span>' + job.years + '+ years of relevant experience';
-        list.appendChild(li);
-      } else {
-        document.getElementById('requirements-section').style.display = 'none';
-      }
+          /* Requirements list */
+          var list = document.getElementById('requirements-list');
+          if (job.years) {
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="req-icon"></span>' + job.years + '+ years of relevant experience';
+            list.appendChild(li);
+          } else {
+            document.getElementById('requirements-section').style.display = 'none';
+          }
 
-      /* Mark as applied if already done */
-      if (JobStorage.hasApplied(job.id)) markApplied();
+          /* Mark as applied if already done */
+          if (JobStorage.hasApplied(job.id)) markApplied();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('job-card').style.display   = 'none';
+          document.getElementById('no-job-msg').innerHTML = '<p>Error loading job details. <a href="jobs.html">Go back</a>.</p>';
+          document.getElementById('no-job-msg').style.display = 'block';
+        });
     }
 
     /* Mark button as applied */

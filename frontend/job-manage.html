@@ -69,59 +69,84 @@
 
     function renderJobs() {
       var container = document.getElementById('my-jobs-container');
-      var jobs      = JobStorage.getAllJobs();
-      container.innerHTML = '';
+      
+      fetch('http://localhost:8000/api/jobs/')
+        .then(response => response.json())
+        .then(jobs => {
+          container.innerHTML = '';
 
-      if (jobs.length === 0) {
-        container.innerHTML =
-          '<div class="empty-state">' +
-            '<div class="empty-state-icon"></div>' +
-            '<p>No jobs posted yet.</p>' +
-            '<p><a href="job-create.html" target="_top">Post your first job listing</a>.</p>' +
-          '</div>';
-        return;
-      }
+          if (jobs.length === 0) {
+            container.innerHTML =
+              '<div class="empty-state">' +
+                '<div class="empty-state-icon"></div>' +
+                '<p>No jobs posted yet.</p>' +
+                '<p><a href="job-create.html" target="_top">Post your first job listing</a>.</p>' +
+              '</div>';
+            return;
+          }
 
-      jobs.slice().reverse().forEach(function (job) {
-        var card = document.createElement('div');
-        card.className = 'job-card';
-        card.innerHTML =
-          '<div class="job-info">' +
-            '<h3>' + job.title + '</h3>' +
-            '<p class="job-meta">' +
-              job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
-              ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
-            '</p>' +
-            '<span class="badge badge-' + job.status + '">' +
-              '<span class="badge-dot"></span>' +
-              (job.status === 'open' ? 'Open' : 'Closed') +
-            '</span>' +
-          '</div>' +
-          '<div class="job-actions">' +
-            '<button class="btn-view">View Details →</button>' +
-            '<button class="btn-delete">Delete</button>' +
-          '</div>';
+          // Show newest first
+          jobs.slice().reverse().forEach(function (job) {
+            var card = document.createElement('div');
+            card.className = 'job-card';
+            card.innerHTML =
+              '<div class="job-info">' +
+                '<h3>' + job.title + '</h3>' +
+                '<p class="job-meta">' +
+                  job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
+                  ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
+                '</p>' +
+                '<span class="badge badge-' + (job.status ? job.status.toLowerCase() : 'open') + '">' +
+                  '<span class="badge-dot"></span>' +
+                  (job.status && job.status.toLowerCase() === 'closed' ? 'Closed' : 'Open') +
+                '</span>' +
+              '</div>' +
+              '<div class="job-actions">' +
+                '<button class="btn-view">View Details →</button>' +
+                '<button class="btn-delete">Delete</button>' +
+              '</div>';
 
-        card.querySelector('.btn-view').addEventListener('click', function () {
-          JobStorage.selectJob(job);
+            card.querySelector('.btn-view').addEventListener('click', function () {
+              window.location.href = 'job-details.html?id=' + job.id;
+            });
+
+            card.querySelector('.btn-delete').addEventListener('click', function () {
+              deleteTarget = job.id;
+              document.getElementById('delete-overlay').style.display = 'flex';
+            });
+
+            container.appendChild(card);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching jobs:', err);
+          container.innerHTML = '<div class="empty-state"><p>Error loading jobs.</p></div>';
         });
-
-        card.querySelector('.btn-delete').addEventListener('click', function () {
-          deleteTarget = job.id;
-          document.getElementById('delete-overlay').style.display = 'flex';
-        });
-
-        container.appendChild(card);
-      });
     }
 
     /* Confirm delete */
     document.getElementById('confirm-delete-btn').addEventListener('click', function () {
       if (deleteTarget !== null) {
-        JobStorage.deleteJob(deleteTarget);
-        renderJobs();
+        // Optimistically close overlay
+        closeDelete();
+        
+        fetch('http://localhost:8000/api/jobs/' + deleteTarget + '/', {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (response.ok || response.status === 204) {
+            renderJobs(); // Refresh the list
+          } else {
+            alert('Failed to delete job. Please try again.');
+          }
+        })
+        .catch(err => {
+          console.error('Error deleting job:', err);
+          alert('Network error occurred while trying to delete.');
+        });
+      } else {
+        closeDelete();
       }
-      closeDelete();
     });
 
     function closeDelete() {
