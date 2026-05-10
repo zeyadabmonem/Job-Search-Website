@@ -133,8 +133,14 @@
     /* ── Fetch and Render Data ── */
     function loadDashboardData() {
       var token = JobStorage.getToken();
-      if (!token) {
+      var user = JobStorage.getUser();
+      
+      if (!token || !user) {
         window.top.location.href = 'login.html';
+        return;
+      }
+      if (user.role !== 'admin') {
+        window.top.location.href = 'index.html';
         return;
       }
 
@@ -146,9 +152,8 @@
         return res.json();
       })
       .then(data => {
-        /* Update Stats */
-        document.getElementById('stat-total').textContent = data.total_active_jobs;
-        document.getElementById('stat-open').textContent  = data.total_active_jobs; // Using as same for now
+        document.getElementById('stat-total').textContent = data.total_jobs || 0;
+        document.getElementById('stat-open').textContent  = data.total_active_jobs || 0; 
         document.getElementById('stat-apps').textContent  = data.total_applications;
 
         /* Render Recent Applications Table */

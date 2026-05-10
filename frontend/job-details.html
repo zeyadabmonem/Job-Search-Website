@@ -112,7 +112,7 @@
       document.getElementById('job-card').style.display   = 'none';
       document.getElementById('no-job-msg').style.display = 'block';
     } else {
-      fetch('http://localhost:8000/api/jobs/' + jobId + '/')
+      fetch('http://127.0.0.1:8000/api/jobs/' + jobId + '/')
         .then(response => {
           if (!response.ok) throw new Error('Job not found');
           return response.json();
@@ -141,8 +141,32 @@
             document.getElementById('requirements-section').style.display = 'none';
           }
 
-          /* Mark as applied if already done */
-          if (JobStorage.hasApplied(job.id)) markApplied();
+          /* Hide apply section for admin users — admins cannot apply to jobs */
+          var currentUser = JobStorage.getUser();
+          if (currentUser && currentUser.role === 'admin') {
+            document.querySelector('.apply-section').style.display = 'none';
+          } else {
+            /* Verify against the real database if the user already applied */
+            var token = JobStorage.getToken();
+            if (token) {
+              fetch('http://127.0.0.1:8000/api/my-applications/', {
+                headers: { 'Authorization': 'Bearer ' + token }
+              })
+              .then(res => {
+                if (res.ok) return res.json();
+                throw new Error('Failed to fetch applications');
+              })
+              .then(apps => {
+                var alreadyApplied = apps.some(function(app) {
+                  return String(app.job_id) === String(job.id);
+                });
+                if (alreadyApplied) markApplied();
+              })
+              .catch(err => console.error(err));
+            }
+          }
+
+
         })
         .catch(err => {
           console.error(err);

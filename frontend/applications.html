@@ -28,9 +28,12 @@
   <script>
     var container = document.getElementById('applied-container');
     var token = JobStorage.getToken();
+    var user = JobStorage.getUser();
 
-    if (!token) {
+    if (!token || !user) {
       window.top.location.href = 'login.html';
+    } else if (user.role === 'admin') {
+      window.top.location.href = 'dashboard.html';
     } else {
       fetch('http://127.0.0.1:8000/api/my-applications/', {
         headers: { 'Authorization': 'Bearer ' + token }

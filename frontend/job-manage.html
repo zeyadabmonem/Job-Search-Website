@@ -65,12 +65,17 @@
 
   <script src="assets/js/storage.js"></script>
   <script>
+    var user = JobStorage.getUser();
+    if (!user || user.role !== 'admin') {
+      window.top.location.href = 'login.html';
+    }
+
     var deleteTarget = null;
 
     function renderJobs() {
       var container = document.getElementById('my-jobs-container');
       
-      fetch('http://localhost:8000/api/jobs/')
+      fetch('http://127.0.0.1:8000/api/jobs/')
         .then(response => response.json())
         .then(jobs => {
           container.innerHTML = '';

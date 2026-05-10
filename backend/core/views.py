@@ -1,7 +1,7 @@
 from rest_framework import generics, filters, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -41,12 +41,13 @@ class JobRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class MyApplicationsAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSeekerRole]
 
     def get(self, request):
         applications = Application.objects.filter(seeker=request.user).select_related('job')
         data = [
             {
+                "job_id": app.job.id,
                 "job_title": app.job.title,
                 "company": app.job.company,
                 "application_status": app.status,
@@ -58,9 +59,10 @@ class MyApplicationsAPIView(APIView):
         return Response(serializer.data)
 
 class AdminDashboardAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminRole]
 
     def get(self, request):
+        total_jobs = Job.objects.count()
         total_active_jobs = Job.objects.filter(status='Open').count()
         total_applications = Application.objects.count()
         latest_apps = Application.objects.select_related('job', 'seeker').order_by('-applied_at')[:5]
@@ -75,6 +77,7 @@ class AdminDashboardAPIView(APIView):
         ]
 
         data = {
+            "total_jobs": total_jobs,
             "total_active_jobs": total_active_jobs,
             "total_applications": total_applications,
             "latest_applications": latest_applications_data

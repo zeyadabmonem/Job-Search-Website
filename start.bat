@@ -15,25 +15,36 @@ if %errorlevel% neq 0 (
 )
 
 :: Install missing dependencies silently
-echo [1/3] Checking dependencies...
-pip install -r backend/requirements.txt --quiet
+echo [1/4] Checking dependencies...
+cd backend
+if not exist venv\Scripts\python.exe (
+    echo [ERROR] Virtual environment not found in backend/venv. Please create it first.
+    pause
+    exit /b
+)
+venv\Scripts\pip install -r requirements.txt --quiet
 
 :: Run migrations just in case
-echo [2/3] Preparing database...
-cd backend
-python manage.py migrate --noinput >nul 2>&1
-cd ..
+echo [2/4] Preparing database...
+venv\Scripts\python manage.py migrate --noinput >nul 2>&1
 
 :: Start Django Backend in a new minimized window
-echo [3/3] Launching Backend Server...
-start /min "JobFinder Backend" cmd /c "cd backend && python manage.py runserver"
+echo [3/4] Launching Backend Server...
+start /min "JobFinder Backend" cmd /c "venv\Scripts\python manage.py runserver"
+cd ..
+
+:: Start Frontend Server in a new minimized window
+echo [4/4] Launching Frontend Server...
+cd frontend
+start /min "JobFinder Frontend" cmd /c "python -m http.server 8080"
+cd ..
 
 :: Wait for server to initialize
 timeout /t 3 /nobreak > nul
 
 :: Open the Frontend Landing Page
-echo [4/4] Opening Frontend Application...
-start "" "frontend/index.html"
+echo Opening Frontend Application...
+start "" "http://localhost:8080/index.html"
 
 echo.
 echo ======================================================
@@ -41,7 +52,7 @@ echo ✅ SUCCESS: JobFinder is now running!
 echo.
 echo API GATEWAY:  http://127.0.0.1:8000/
 echo ADMIN PANEL:  http://127.0.0.1:8000/admin/
-echo FRONTEND:     Opened in your browser
+echo FRONTEND:     http://localhost:8080/index.html
 echo.
 echo (Keep the minimized command window open to maintain the connection)
 echo ======================================================

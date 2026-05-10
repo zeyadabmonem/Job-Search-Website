@@ -44,7 +44,7 @@
     var params = new URLSearchParams(window.location.search);
     var queryString = params.toString() ? '?' + params.toString() : '';
 
-    fetch('http://localhost:8000/api/jobs/' + queryString)
+    fetch('http://127.0.0.1:8000/api/jobs/' + queryString)
       .then(response => response.json())
       .then(results => {
         /* Update count pill */

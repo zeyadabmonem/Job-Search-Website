@@ -11,6 +11,7 @@ class JobSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MyApplicationSerializer(serializers.Serializer):
+    job_id = serializers.IntegerField()
     job_title = serializers.CharField()
     company = serializers.CharField()
     application_status = serializers.CharField()
@@ -22,6 +23,7 @@ class DashboardApplicationSerializer(serializers.Serializer):
     status = serializers.CharField()
 
 class DashboardStatsSerializer(serializers.Serializer):
+    total_jobs = serializers.IntegerField()
     total_active_jobs = serializers.IntegerField()
     total_applications = serializers.IntegerField()
     latest_applications = DashboardApplicationSerializer(many=True)

@@ -108,6 +108,11 @@
 
   <script src="assets/js/storage.js"></script>
   <script>
+    var user = JobStorage.getUser();
+    if (!user || user.role !== 'admin') {
+      window.top.location.href = 'index.html';
+    }
+
     var fields = [
       { id: 'jobtitle',    errId: 'jobtitle-error',    valid: function(v) { return v.trim() !== ''; } },
       { id: 'company',     errId: 'company-error',     valid: function(v) { return v.trim() !== ''; } },
@@ -182,7 +187,11 @@
       })
       .catch(error => {
         console.error('Error creating job:', error);
-        alert('Failed to publish job. Please ensure the backend is running.');
+        if (error.message === 'You do not have permission to post jobs.') {
+          alert(error.message);
+        } else {
+          alert('Failed to publish job. Please ensure the backend is running.');
+        }
       });
     });
 

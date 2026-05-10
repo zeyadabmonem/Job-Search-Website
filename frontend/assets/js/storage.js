@@ -64,34 +64,12 @@ var JobStorage = (function () {
     save(KEYS.jobs, getAllJobs().filter(function(j) { return j.id !== jobId; }));
   }
 
-  /* ── Selected Job ──────────────────────────────────────── */
-
-  function selectJob(job) {
-    save(KEYS.selected, job);
-    navigate('job-details.html');
-  }
-
-  function getSelectedJob() { return load(KEYS.selected); }
-
-  function clearSelectedJob() { delete memStorage[KEYS.selected]; }
 
   /* ── Applied Jobs ──────────────────────────────────────── */
 
   function getAppliedJobs() { return load(KEYS.applied) || []; }
 
-  function applyToJob(job) {
-    var applied = getAppliedJobs();
-    var already = applied.some(function(j) { return j.id === job.id; });
-    if (already) return false;
-    job.appliedAt = new Date().toISOString();
-    applied.push(job);
-    save(KEYS.applied, applied);
-    return true;
-  }
 
-  function hasApplied(jobId) {
-    return getAppliedJobs().some(function(j) { return j.id === jobId; });
-  }
 
   /* ── Auth ──────────────────────────────────────────────── */
 
@@ -128,12 +106,7 @@ var JobStorage = (function () {
     saveJob:           saveJob,
     updateJob:         updateJob,
     deleteJob:         deleteJob,
-    selectJob:         selectJob,
-    getSelectedJob:    getSelectedJob,
-    clearSelectedJob:  clearSelectedJob,
     getAppliedJobs:    getAppliedJobs,
-    applyToJob:        applyToJob,
-    hasApplied:        hasApplied,
     setUser:           setUser,
     getUser:           getUser,
     setToken:          setToken,
