@@ -1,0 +1,170 @@
+/* ── Register page styles ─────────────────────────────────── */
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8efff 50%, #f5f3ff 100%);
+  padding: 24px;
+}
+
+.register-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 48px rgba(37,99,235,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  max-width: 480px;
+  padding: 44px 40px;
+}
+
+/* Logo */
+.register-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.register-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: #2563eb;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.register-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+.register-logo-accent { color: #2563eb; }
+
+.register-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.register-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 28px;
+}
+
+/* Fields */
+.register-fields { display: flex; flex-direction: column; gap: 18px; }
+
+/* Role toggle */
+.role-toggle {
+  display: flex;
+  gap: 10px;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.role-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+.role-btn.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* Company field — hidden unless admin role selected */
+.company-field { display: none; }
+.company-field.visible { display: flex; }
+
+/* Password wrap */
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 42px; }
+
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.eye-btn:hover { color: #475569; }
+
+/* Error message */
+.error-msg {
+  font-size: 0.83rem;
+  color: #dc2626;
+  font-weight: 500;
+  text-align: center;
+  min-height: 20px;
+}
+
+/* Submit button */
+.btn-register {
+  width: 100%;
+  padding: 13px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+  margin-top: 4px;
+}
+
+.btn-register:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+}
+
+.btn-register:active { transform: translateY(0); }
+
+.register-footer {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.register-footer a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-footer a:hover { text-decoration: underline; }

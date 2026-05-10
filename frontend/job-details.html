@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Details – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/job-details.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="page-wrapper">
+    <div class="container-900">
+
+      <!-- No job selected fallback -->
+      <div id="no-job-msg" style="display:none; text-align:center; padding:60px 20px;">
+        <p style="font-size:1.1rem; color:#64748b;">
+          No job selected. Go back to the <a href="jobs.html" style="color:#2563eb;">jobs list</a>.
+        </p>
+      </div>
+
+      <!-- Main card -->
+      <div class="card" id="job-card">
+
+        <!-- Hero -->
+        <div class="job-hero">
+          <div class="job-hero-inner">
+            <div class="company-logo" aria-hidden="true"></div>
+            <div>
+              <h1 class="job-title" id="detail-title">—</h1>
+              <p class="job-company">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 21h18M9 8h1m-1 4h1m4-4h1m-1 4h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/>
+                </svg>
+                <span id="detail-company">—</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+
+          <!-- Status row -->
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:28px;">
+            <span class="badge" id="status-badge">
+              <span class="badge-dot"></span>
+              <span id="status-text">—</span>
+            </span>
+          </div>
+
+          <!-- Salary -->
+          <div class="detail-section">
+            <p class="section-label">Compensation</p>
+            <div class="salary-box">
+              <div>
+                <div class="salary-amount" id="detail-salary">—</div>
+                <div class="salary-period">/ month</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="detail-section">
+            <p class="section-label">About the Role</p>
+            <div class="description-box" id="detail-description">—</div>
+          </div>
+
+          <!-- Requirements -->
+          <div class="detail-section" id="requirements-section">
+            <p class="section-label">Requirements</p>
+            <ul class="requirements-list" id="requirements-list"></ul>
+          </div>
+
+          <!-- Apply CTA -->
+          <div class="apply-section">
+            <p class="apply-note">
+              By clicking Apply you confirm your interest. Your profile will be shared with the hiring team.
+            </p>
+            <button class="btn btn-primary" id="apply-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                   viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              </svg>
+              Apply Now
+            </button>
+          </div>
+
+        </div>
+
+      </div><!-- /card -->
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-icon"></span>
+    <span id="toast-text">Application submitted!</span>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var jobId = params.get('id');
+    var job = null; // Store it globally for the apply button
+
+    if (!jobId) {
+      document.getElementById('job-card').style.display   = 'none';
+      document.getElementById('no-job-msg').style.display = 'block';
+    } else {
+      fetch('http://localhost:8000/api/jobs/' + jobId + '/')
+        .then(response => {
+          if (!response.ok) throw new Error('Job not found');
+          return response.json();
+        })
+        .then(data => {
+          job = data;
+          /* Fill in details */
+          document.getElementById('detail-title').textContent       = job.title;
+          document.getElementById('detail-company').textContent     = job.company;
+          document.getElementById('detail-salary').textContent      = '$' + Number(job.salary).toLocaleString();
+          document.getElementById('detail-description').textContent = job.description;
+
+          /* Status badge */
+          var badge = document.getElementById('status-badge');
+          var text  = document.getElementById('status-text');
+          badge.classList.add(job.status && job.status.toLowerCase() === 'open' ? 'badge-open' : 'badge-closed');
+          text.textContent = job.status && job.status.toLowerCase() === 'open' ? 'Open' : 'Closed';
+
+          /* Requirements list */
+          var list = document.getElementById('requirements-list');
+          if (job.years) {
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="req-icon"></span>' + job.years + '+ years of relevant experience';
+            list.appendChild(li);
+          } else {
+            document.getElementById('requirements-section').style.display = 'none';
+          }
+
+          /* Mark as applied if already done */
+          if (JobStorage.hasApplied(job.id)) markApplied();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('job-card').style.display   = 'none';
+          document.getElementById('no-job-msg').innerHTML = '<p>Error loading job details. <a href="jobs.html">Go back</a>.</p>';
+          document.getElementById('no-job-msg').style.display = 'block';
+        });
+    }
+
+    /* Mark button as applied */
+    function markApplied() {
+      var btn = document.getElementById('apply-btn');
+      btn.disabled     = true;
+      btn.innerHTML    = 'Applied';
+      btn.classList.add('btn-applied');
+    }
+
+    /* Apply button click handler */
+    document.getElementById('apply-btn').addEventListener('click', function () {
+      if (!job) return;
+      var saved = JobStorage.applyToJob(job);
+      if (!saved) {
+        showToast('You have already applied to this job.');
+        return;
+      }
+      markApplied();
+      showToast('Application submitted successfully!');
+    });
+
+    /* Show toast notification */
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); }, 3500);
+    }
+  </script>
+
+</body>
+</html>
+
+
+
+
