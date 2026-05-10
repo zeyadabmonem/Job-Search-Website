@@ -74,18 +74,14 @@
     document.getElementById('search-form').addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var titleInput = document.getElementById('search-title').value.trim().toLowerCase();
+      var titleInput = document.getElementById('search-title').value.trim();
       var yearsInput = document.getElementById('search-years').value.trim();
-      var yearsNum   = yearsInput !== '' ? Number(yearsInput) : null;
 
-      /* Filter all jobs by title and/or experience */
-      var results = JobStorage.getAllJobs().filter(function (job) {
-        var titleMatch = titleInput === '' || job.title.toLowerCase().includes(titleInput);
-        var yearsMatch = yearsNum === null || job.years >= yearsNum;
-        return titleMatch && yearsMatch;
-      });
+      var params = new URLSearchParams();
+      if (titleInput) params.append('search', titleInput);
+      if (yearsInput) params.append('years__gte', yearsInput);
 
-      JobStorage.saveSearchAndGo(results);
+      window.location.href = 'search-results.html?' + params.toString();
     });
   </script>
 

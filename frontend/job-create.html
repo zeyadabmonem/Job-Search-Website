@@ -141,20 +141,38 @@
         return;
       }
 
+      var jobStatus = document.getElementById('status').value;
+      
       var job = {
-        id:          Date.now(),
         title:       document.getElementById('jobtitle').value.trim(),
         company:     document.getElementById('company').value.trim(),
         salary:      Number(document.getElementById('salary').value),
         years:       Number(document.getElementById('years').value),
-        status:      document.getElementById('status').value,
+        status:      jobStatus.charAt(0).toUpperCase() + jobStatus.slice(1), // Convert 'open' to 'Open'
         description: document.getElementById('description').value.trim()
       };
 
-      JobStorage.saveJob(job);
-
-      document.getElementById('form-body').style.display = 'none';
-      document.getElementById('success-overlay').classList.add('visible');
+      fetch('http://localhost:8000/api/jobs/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(job)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('form-body').style.display = 'none';
+        document.getElementById('success-overlay').classList.add('visible');
+      })
+      .catch(error => {
+        console.error('Error creating job:', error);
+        alert('Failed to publish job. Please ensure the backend is running.');
+      });
     });
 
     function resetForm() {
