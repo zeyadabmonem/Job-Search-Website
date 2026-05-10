@@ -152,15 +152,26 @@
         description: document.getElementById('description').value.trim()
       };
 
-      fetch('http://localhost:8000/api/jobs/', {
+      var token = JobStorage.getToken();
+      if (!token) {
+        alert('Your session has expired. Please log in again.');
+        window.top.location.href = 'login.html';
+        return;
+      }
+
+      fetch('http://127.0.0.1:8000/api/jobs/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
         },
         body: JSON.stringify(job)
       })
       .then(response => {
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            throw new Error('You do not have permission to post jobs.');
+          }
           throw new Error('Network response was not ok');
         }
         return response.json();

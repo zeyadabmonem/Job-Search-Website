@@ -27,44 +27,49 @@
   <script src="assets/js/storage.js"></script>
   <script>
     var container = document.getElementById('applied-container');
-    var jobs = JobStorage.getAppliedJobs();
+    var token = JobStorage.getToken();
 
-    if (jobs.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state">' +
-          '<div class="empty-state-icon"></div>' +
-          '<p>No applications yet.</p>' +
-          '<p>Browse <a href="jobs.html">available jobs</a> and start applying.</p>' +
-        '</div>';
-    } 
-    else {
-      jobs.slice().reverse().forEach(function(job) {
-        var card = document.createElement('div');
-        card.className = 'app-card';
+    if (!token) {
+      window.top.location.href = 'login.html';
+    } else {
+      fetch('http://127.0.0.1:8000/api/my-applications/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => res.json())
+      .then(apps => {
+        if (apps.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">' +
+              '<div class="empty-state-icon"></div>' +
+              '<p>No applications yet.</p>' +
+              '<p>Browse <a href="jobs.html">available jobs</a> and start applying.</p>' +
+            '</div>';
+        } 
+        else {
+          apps.forEach(function(app) {
+            var card = document.createElement('div');
+            card.className = 'app-card';
 
-        var dateStr = '';
-        if (job.appliedAt) {
-          var d = new Date(job.appliedAt);
-          dateStr = 'Applied on ' + d.toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric'
+            var d = new Date(app.applied_at);
+            var dateStr = 'Applied on ' + d.toLocaleDateString('en-US', {
+              year: 'numeric', month: 'short', day: 'numeric'
+            });
+
+            card.innerHTML =
+              '<div class="app-info">' +
+                '<h3>' + app.job_title + '</h3>' +
+                '<p class="app-meta">' + app.company + '</p>' +
+                '<p class="app-date">' + dateStr + '</p>' +
+              '</div>' +
+              '<span class="applied-tag">' + app.application_status + '</span>';
+
+            container.appendChild(card);
           });
         }
-
-        card.innerHTML =
-          '<div class="app-info">' +
-            '<h3>' + job.title + '</h3>' +
-
-            '<p class="app-meta">' +
-              job.company + ' - $' + Number(job.salary).toLocaleString() + ' per month - ' +
-              job.years + '+ years of experience' +
-            '</p>' +
-
-            (dateStr ? '<p class="app-date">' + dateStr + '</p>' : '') +
-          '</div>' +
-
-          '<span class="applied-tag">Applied</span>';
-
-        container.appendChild(card);
+      })
+      .catch(err => {
+        console.error(err);
+        container.innerHTML = '<div class="empty-state"><p>Error loading applications.</p></div>';
       });
     }
   </script>

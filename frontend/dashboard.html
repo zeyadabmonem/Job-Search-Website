@@ -130,107 +130,70 @@
 
   <script src="assets/js/storage.js"></script>
   <script>
-    var allJobs      = JobStorage.getAllJobs();
-    var filteredJobs = allJobs.slice();
-    var deleteTarget = null;
-
-    /* ── Render stats ── */
-    function renderStats() {
-      var jobs  = JobStorage.getAllJobs();
-      var open  = jobs.filter(function(j){ return j.status === 'open'; }).length;
-      var apps  = JobStorage.getAppliedJobs().length;
-      document.getElementById('stat-total').textContent = jobs.length;
-      document.getElementById('stat-open').textContent  = open;
-      document.getElementById('stat-apps').textContent  = apps;
-    }
-
-    /* ── Render table rows ── */
-    function renderTable(jobs) {
-      var tbody = document.getElementById('jobs-tbody');
-      tbody.innerHTML = '';
-
-      if (jobs.length === 0) {
-        tbody.innerHTML =
-          '<tr><td colspan="4">' +
-            '<div class="table-empty">No jobs found.</div>' +
-          '</td></tr>';
-        document.getElementById('table-info').textContent = 'No jobs';
+    /* ── Fetch and Render Data ── */
+    function loadDashboardData() {
+      var token = JobStorage.getToken();
+      if (!token) {
+        window.top.location.href = 'login.html';
         return;
       }
 
-      document.getElementById('table-info').textContent =
-        'Showing ' + jobs.length + ' job' + (jobs.length !== 1 ? 's' : '');
+      fetch('http://127.0.0.1:8000/api/admin/dashboard/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch dashboard data');
+        return res.json();
+      })
+      .then(data => {
+        /* Update Stats */
+        document.getElementById('stat-total').textContent = data.total_active_jobs;
+        document.getElementById('stat-open').textContent  = data.total_active_jobs; // Using as same for now
+        document.getElementById('stat-apps').textContent  = data.total_applications;
 
-      jobs.forEach(function (job) {
+        /* Render Recent Applications Table */
+        renderApplicationsTable(data.latest_applications);
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error loading dashboard data.');
+      });
+    }
+
+    function renderApplicationsTable(apps) {
+      var tbody = document.getElementById('jobs-tbody');
+      tbody.innerHTML = '';
+
+      /* Update Table Header for Applications */
+      document.querySelector('.table-header h3').textContent = 'Recent Applications';
+      document.querySelector('.jobs-table thead tr').innerHTML = 
+        '<th>Applicant</th><th>Job Title</th><th>Status</th><th style="text-align:right;">Date</th>';
+
+      if (!apps || apps.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4"><div class="table-empty">No recent applications.</div></td></tr>';
+        document.getElementById('table-info').textContent = 'No applications';
+        return;
+      }
+
+      document.getElementById('table-info').textContent = 'Showing latest ' + apps.length + ' applications';
+
+      apps.forEach(function (app) {
         var tr = document.createElement('tr');
         tr.innerHTML =
+          '<td><div class="job-cell-title">' + app.applicant_name + '</div></td>' +
+          '<td><div class="job-cell-meta">' + app.job_title + '</div></td>' +
           '<td>' +
-            '<div class="job-cell-title">' + job.title + '</div>' +
-            '<div class="job-cell-meta">' + job.company + ' · ' + job.years + '+ yrs exp</div>' +
-          '</td>' +
-          '<td>' +
-            '<span class="badge badge-' + job.status + '">' +
-              '<span class="badge-dot"></span>' +
-              (job.status === 'open' ? 'Open' : 'Closed') +
+            '<span class="badge badge-' + app.status.toLowerCase() + '">' +
+              '<span class="badge-dot"></span>' + app.status +
             '</span>' +
           '</td>' +
-          '<td style="font-weight:600; color:#0f172a;">$' + Number(job.salary).toLocaleString() + '<span style="font-size:0.78rem;font-weight:400;color:#94a3b8;">/mo</span></td>' +
-          '<td>' +
-            '<div class="action-btns">' +
-              '<button class="action-btn action-btn-edit" title="Edit"></button>' +
-              '<button class="action-btn action-btn-delete" title="Delete"></button>' +
-            '</div>' +
-          '</td>';
-
-        /* Edit — go to create-job with prefilled data (future enhancement) */
-        tr.querySelector('.action-btn-edit').addEventListener('click', function () {
-          alert('Edit feature: coming soon.\nJob ID: ' + job.id);
-        });
-
-        /* Delete — show confirm overlay */
-        tr.querySelector('.action-btn-delete').addEventListener('click', function () {
-          deleteTarget = job.id;
-          document.getElementById('delete-overlay').style.display = 'flex';
-        });
-
+          '<td style="text-align:right; font-size:0.85rem; color:#64748b;">Just now</td>';
         tbody.appendChild(tr);
       });
     }
 
-    /* ── Search filter ── */
-    document.getElementById('table-search').addEventListener('input', function () {
-      var q = this.value.trim().toLowerCase();
-      filteredJobs = allJobs.filter(function (j) {
-        return j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q);
-      });
-      renderTable(filteredJobs);
-    });
-
-    /* ── Delete confirm ── */
-    document.getElementById('confirm-delete-btn').addEventListener('click', function () {
-      if (deleteTarget !== null) {
-        JobStorage.deleteJob(deleteTarget);
-        allJobs      = JobStorage.getAllJobs();
-        filteredJobs = allJobs.slice();
-        renderStats();
-        renderTable(filteredJobs);
-      }
-      closeDelete();
-    });
-
-    function closeDelete() {
-      deleteTarget = null;
-      document.getElementById('delete-overlay').style.display = 'none';
-    }
-
-    /* Close overlay clicking outside */
-    document.getElementById('delete-overlay').addEventListener('click', function (e) {
-      if (e.target === this) closeDelete();
-    });
-
     /* ── Init ── */
-    renderStats();
-    renderTable(allJobs);
+    loadDashboardData();
   </script>
 
 </body>

@@ -130,8 +130,12 @@
         // Optimistically close overlay
         closeDelete();
         
-        fetch('http://localhost:8000/api/jobs/' + deleteTarget + '/', {
-          method: 'DELETE'
+        var token = JobStorage.getToken();
+        fetch('http://127.0.0.1:8000/api/jobs/' + deleteTarget + '/', {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
         })
         .then(response => {
           if (response.ok || response.status === 204) {

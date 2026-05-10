@@ -111,41 +111,61 @@
 
   <script src="assets/js/storage.js"></script>
   <script>
-    var user = JobStorage.getUser();
+    var token = JobStorage.getToken();
 
-    if (!user) {
+    if (!token) {
       document.getElementById('no-user-msg').style.display = 'block';
     } else {
       document.getElementById('profile-card').style.display = 'block';
 
-      /* Fill hero */
-      document.getElementById('profile-avatar').textContent = (user.name || 'U')[0].toUpperCase();
-      document.getElementById('profile-name').textContent   = user.name || 'User';
-      document.getElementById('profile-email').textContent  = user.email;
+      fetch('http://127.0.0.1:8000/api/auth/profile/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => res.json())
+      .then(user => {
+        /* Fill hero */
+        document.getElementById('profile-avatar').textContent = (user.username || 'U')[0].toUpperCase();
+        document.getElementById('profile-name').textContent   = user.username || 'User';
+        document.getElementById('profile-email').textContent  = user.email;
 
-      var roleLabel = user.role === 'admin' ? 'Company Admin' : 'Job Seeker';
-      document.getElementById('profile-role-badge').textContent = roleLabel;
+        var roleLabel = user.role === 'admin' ? 'Company Admin' : 'Job Seeker';
+        document.getElementById('profile-role-badge').textContent = roleLabel;
 
-      /* Fill info rows */
-      document.getElementById('info-name').textContent  = user.name;
-      document.getElementById('info-email').textContent = user.email;
-      document.getElementById('info-role').textContent  = user.role === 'admin' ? 'Company Admin' : 'Job Seeker';
+        /* Fill info rows */
+        document.getElementById('info-name').textContent  = user.username;
+        document.getElementById('info-email').textContent = user.email;
+        document.getElementById('info-role').textContent  = user.role === 'admin' ? 'Company Admin' : 'Job Seeker';
 
-      if (user.company) {
-        document.getElementById('info-company-row').style.display = 'flex';
-        document.getElementById('info-company').textContent = user.company;
-      }
+        if (user.company) {
+          document.getElementById('info-company-row').style.display = 'flex';
+          document.getElementById('info-company').textContent = user.company;
+        }
 
-      /* Activity */
-      document.getElementById('info-applied').textContent = JobStorage.getAppliedJobs().length;
+        /* Activity (using a separate fetch for app count if needed, but for now just setting to 0 or keeping it) */
+        if (user.role === 'seeker') {
+           fetch('http://127.0.0.1:8000/api/my-applications/', {
+              headers: { 'Authorization': 'Bearer ' + token }
+           })
+           .then(res => res.json())
+           .then(apps => {
+              document.getElementById('info-applied').textContent = apps.length;
+           });
+        } else {
+           document.getElementById('info-applied').parentElement.parentElement.style.display = 'none';
+        }
 
-      /* Adjust quick actions for admin */
-      if (user.role === 'admin') {
-        document.getElementById('view-apps-btn').href        = 'job-manage.html';
-        document.getElementById('view-apps-btn').textContent = 'My Jobs';
-        document.getElementById('search-btn').href           = 'job-create.html';
-        document.getElementById('search-btn').textContent    = 'Add Job';
-      }
+        /* Adjust quick actions for admin */
+        if (user.role === 'admin') {
+          document.getElementById('view-apps-btn').href        = 'job-manage.html';
+          document.getElementById('view-apps-btn').textContent = 'My Jobs';
+          document.getElementById('search-btn').href           = 'job-create.html';
+          document.getElementById('search-btn').textContent    = 'Add Job';
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error loading profile.');
+      });
     }
   </script>
 

@@ -163,13 +163,38 @@
     /* Apply button click handler */
     document.getElementById('apply-btn').addEventListener('click', function () {
       if (!job) return;
-      var saved = JobStorage.applyToJob(job);
-      if (!saved) {
-        showToast('You have already applied to this job.');
+      
+      var token = JobStorage.getToken();
+      if (!token) {
+        alert('Please log in as a Seeker to apply for jobs.');
+        window.top.location.href = 'login.html';
         return;
       }
-      markApplied();
-      showToast('Application submitted successfully!');
+
+      fetch('http://127.0.0.1:8000/api/apply/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ job: job.id })
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => { throw err; });
+        }
+        return response.json();
+      })
+      .then(data => {
+        markApplied();
+        showToast('Application submitted successfully!');
+      })
+      .catch(error => {
+        console.error('Error applying:', error);
+        var msg = 'Failed to submit application.';
+        if (error.detail) msg = error.detail;
+        showToast(msg);
+      });
     });
 
     /* Show toast notification */
