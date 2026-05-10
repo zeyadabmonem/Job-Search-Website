@@ -62,39 +62,51 @@ form.addEventListener('submit', function (e) {
   loginBtn.textContent = 'Signing in…';
   loginBtn.disabled    = true;
 
-  /*
-   * In a real app this would be an API call.
-   * For now: demo users stored in memory at registration,
-   * or fall back to a hard-coded demo admin account.
-   */
-  setTimeout(function () {
-    var users = window.jf_users || [];
-    var match = users.find(function (u) {
-      return u.email === email && u.password === pass;
-    });
-
-    /* Demo admin fallback (admin@jobfinder.com / admin123) */
-    if (!match && email === 'admin@jobfinder.com' && pass === 'admin123') {
-      match = { name: 'Admin', email: email, role: 'admin' };
+  fetch('http://127.0.0.1:8000/api/auth/login/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: pass })
+  })
+  .then(function(res) {
+    if (!res.ok) {
+      return res.json().then(function(err) { throw err; });
     }
+    return res.json();
+  })
+  .then(function(data) {
+    var token = data.access;
+    JobStorage.setToken(token);
+    
+    /* Decode JWT payload to get user info without a second API call */
+    var payloadBase64 = token.split('.')[1];
+    var decodedPayload = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
+    
+    var userObj = {
+      email: decodedPayload.email,
+      role: decodedPayload.role,
+      name: decodedPayload.username, /* using username from JWT as name fallback */
+      company: decodedPayload.company || ''
+    };
+    JobStorage.setUser(userObj);
 
-    if (!match) {
-      errorMsg.textContent = 'Invalid email or password.';
-      loginBtn.textContent = 'Login';
-      loginBtn.disabled    = false;
-      return;
-    }
-
-    /* Save session and redirect */
-    JobStorage.setUser({ name: match.name, email: match.email, role: match.role });
-
-    if (match.role === 'admin') {
-      window.top.location.href = 'dashboard.html';
-    } else {
-      window.top.location.href = 'index.html';
-    }
-
-  }, 700);
+    loginBtn.textContent = 'Success! Redirecting…';
+    setTimeout(function () {
+      if (userObj.role === 'admin') {
+        window.top.location.href = 'dashboard.html';
+      } else {
+        window.top.location.href = 'index.html';
+      }
+    }, 600);
+  })
+  .catch(function(err) {
+    console.error(err);
+    var errorText = 'Invalid email or password.';
+    if (err.detail) errorText = err.detail;
+    
+    errorMsg.textContent = errorText;
+    loginBtn.textContent = 'Login';
+    loginBtn.disabled    = false;
+  });
 });
 
 

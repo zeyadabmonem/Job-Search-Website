@@ -1,11 +1,20 @@
-from rest_framework import generics, filters, status
+from rest_framework import generics, filters, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from .models import Job, Application
-from .serializers import JobSerializer, MyApplicationSerializer, DashboardStatsSerializer, ApplySerializer, ApplicationSerializer
+from .serializers import (
+    JobSerializer, MyApplicationSerializer, DashboardStatsSerializer, 
+    ApplySerializer, ApplicationSerializer, UserRegistrationSerializer, 
+    UserProfileSerializer, CustomTokenObtainPairSerializer
+)
+
+User = get_user_model()
 
 class JobListCreateAPIView(generics.ListCreateAPIView):
     queryset = Job.objects.all()
@@ -80,3 +89,18 @@ class ApplyAPIView(APIView):
             application = Application.objects.create(seeker=request.user, job=job)
             return Response(ApplicationSerializer(application).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = UserRegistrationSerializer
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = UserProfileSerializer
+
+    def get_object(self):
+        return self.request.user
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

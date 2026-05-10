@@ -1,5 +1,20 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import User
+
+class User(AbstractUser):
+    ROLE_CHOICES = (
+        ('seeker', 'Job Seeker'),
+        ('admin', 'Admin/Employer'),
+    )
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='seeker')
+    email = models.EmailField(unique=True)
+    company = models.CharField(max_length=255, blank=True, null=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    def __str__(self):
+        return self.email
 
 class Job(models.Model):
     STATUS_CHOICES = (
