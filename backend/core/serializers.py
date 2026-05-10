@@ -18,6 +18,7 @@ class MyApplicationSerializer(serializers.Serializer):
     applied_at = serializers.DateTimeField()
 
 class DashboardApplicationSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     job_title = serializers.CharField()
     applicant_name = serializers.CharField()
     status = serializers.CharField()

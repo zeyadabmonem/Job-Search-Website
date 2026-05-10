@@ -69,6 +69,7 @@ class AdminDashboardAPIView(APIView):
 
         latest_applications_data = [
             {
+                "id": app.id,
                 "job_title": app.job.title,
                 "applicant_name": app.seeker.username,
                 "status": app.status
@@ -101,6 +102,22 @@ class ApplyAPIView(APIView):
             application = Application.objects.create(seeker=request.user, job=job)
             return Response(ApplicationSerializer(application).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ApplicationStatusUpdateAPIView(APIView):
+    permission_classes = [IsAdminRole]
+
+    def patch(self, request, pk):
+        try:
+            application = Application.objects.get(pk=pk)
+        except Application.DoesNotExist:
+            return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        new_status = request.data.get('status')
+        if new_status in dict(Application.STATUS_CHOICES):
+            application.status = new_status
+            application.save()
+            return Response({"status": application.status})
+        return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

@@ -8,7 +8,8 @@ from .views import (
     ApplyAPIView,
     RegisterView, 
     UserProfileView, 
-    CustomTokenObtainPairView
+    CustomTokenObtainPairView,
+    ApplicationStatusUpdateAPIView
 )
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path('jobs/<int:pk>/', JobRetrieveUpdateDestroyAPIView.as_view(), name='job-detail'),
     path('my-applications/', MyApplicationsAPIView.as_view(), name='my-applications'),
     path('admin/dashboard/', AdminDashboardAPIView.as_view(), name='admin-dashboard'),
+    path('admin/application/<int:pk>/status/', ApplicationStatusUpdateAPIView.as_view(), name='update-application-status'),
     path('apply/', ApplyAPIView.as_view(), name='apply'),
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='login'),
