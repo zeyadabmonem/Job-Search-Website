@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Job, Application
+from .permissions import IsAdminRole, IsSeekerRole
 from .serializers import (
     JobSerializer, MyApplicationSerializer, DashboardStatsSerializer, 
     ApplySerializer, ApplicationSerializer, UserRegistrationSerializer, 
@@ -19,7 +20,11 @@ User = get_user_model()
 class JobListCreateAPIView(generics.ListCreateAPIView):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [AllowAny]
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAdminRole()]
     
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {'years': ['gte', 'lte', 'exact'], 'status': ['exact']}
@@ -28,7 +33,11 @@ class JobListCreateAPIView(generics.ListCreateAPIView):
 class JobRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [AllowAny]
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAdminRole()]
 
 
 class MyApplicationsAPIView(APIView):
@@ -74,7 +83,7 @@ class AdminDashboardAPIView(APIView):
         return Response(serializer.data)
 
 class ApplyAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSeekerRole]
 
     def post(self, request):
         serializer = ApplySerializer(data=request.data)
