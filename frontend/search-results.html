@@ -42,7 +42,8 @@
     var countEl   = document.getElementById('results-count');
 
     var params = new URLSearchParams(window.location.search);
-    var queryString = params.toString() ? '?' + params.toString() : '';
+    params.set('status', 'Open');
+    var queryString = '?' + params.toString();
 
     fetch('http://127.0.0.1:8000/api/jobs/' + queryString)
       .then(response => response.json())

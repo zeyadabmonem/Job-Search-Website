@@ -84,7 +84,7 @@ form.addEventListener('submit', function (e) {
     var userObj = {
       email: decodedPayload.email,
       role: decodedPayload.role,
-      name: decodedPayload.username, /* using username from JWT as name fallback */
+      name: decodedPayload.name || decodedPayload.username, /* preference for display name */
       company: decodedPayload.company || ''
     };
     JobStorage.setUser(userObj);

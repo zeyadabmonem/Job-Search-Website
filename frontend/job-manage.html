@@ -46,19 +46,21 @@
 
   <!-- Confirm delete dialog -->
   <div id="delete-overlay" style="
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
-    z-index:1000; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:14px; padding:32px; max-width:360px;
-                width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2); text-align:center;">
-      <div style="font-size:2.5rem; margin-bottom:12px;"></div>
-      <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">Delete this job?</h3>
-      <p style="font-size:0.875rem; color:#64748b; margin-bottom:24px;">
-        This action cannot be undone.
+    display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.6);
+    z-index:1000; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
+    <div style="background:#fff; border-radius:18px; padding:32px; max-width:380px;
+                width:90%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); text-align:center;">
+      <div style="background:#fee2e2; width:64px; height:64px; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      </div>
+      <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:10px; color:#1e293b;">Delete this job?</h3>
+      <p style="font-size:0.95rem; color:#64748b; margin-bottom:28px; line-height:1.5;">
+        This listing will be permanently removed. This action cannot be undone.
       </p>
-      <div style="display:flex; gap:10px; justify-content:center;">
-        <button class="btn btn-ghost" onclick="closeDelete()">Cancel</button>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button class="btn btn-ghost" onclick="closeDelete()" style="padding:10px 24px;">Cancel</button>
         <button class="btn btn-primary" id="confirm-delete-btn"
-                style="background:#dc2626; box-shadow:none;">Delete</button>
+                style="background:#dc2626; box-shadow:none; padding:10px 24px; min-width:100px;">Delete</button>
       </div>
     </div>
   </div>
@@ -107,12 +109,24 @@
                 '</span>' +
               '</div>' +
               '<div class="job-actions">' +
-                '<button class="btn-view">View Details →</button>' +
+                '<button class="btn-view">View Details</button>' +
+                '<button class="btn-edit" style="background:#f0f9ff; color:#0369a1; border:1px solid #bae6fd; padding:8px 16px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:\'DM Sans\', sans-serif; transition:background 0.2s, transform 0.15s;">Edit</button>' +
+                '<button class="btn-toggle-status" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; padding:8px 16px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:\'DM Sans\', sans-serif; transition:background 0.2s, transform 0.15s;">' + 
+                  (job.status === 'Open' ? 'Close Job' : 'Open Job') + 
+                '</button>' +
                 '<button class="btn-delete">Delete</button>' +
               '</div>';
 
             card.querySelector('.btn-view').addEventListener('click', function () {
               window.location.href = 'job-details.html?id=' + job.id;
+            });
+
+            card.querySelector('.btn-edit').addEventListener('click', function () {
+              window.location.href = 'job-edit.html?id=' + job.id;
+            });
+
+            card.querySelector('.btn-toggle-status').addEventListener('click', function () {
+              toggleJobStatus(job.id, job.status);
             });
 
             card.querySelector('.btn-delete').addEventListener('click', function () {
@@ -132,31 +146,67 @@
     /* Confirm delete */
     document.getElementById('confirm-delete-btn').addEventListener('click', function () {
       if (deleteTarget !== null) {
-        // Optimistically close overlay
-        closeDelete();
+        var idToDelete = deleteTarget;
+        var btn = document.getElementById('confirm-delete-btn');
+        var originalText = btn.textContent;
+        
+        // Show loading state
+        btn.disabled = true;
+        btn.textContent = 'Deleting...';
+        btn.style.opacity = '0.7';
         
         var token = JobStorage.getToken();
-        fetch('http://127.0.0.1:8000/api/jobs/' + deleteTarget + '/', {
+        fetch('http://127.0.0.1:8000/api/jobs/' + idToDelete + '/', {
           method: 'DELETE',
           headers: {
-            'Authorization': 'Bearer ' + token
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
           }
         })
         .then(response => {
           if (response.ok || response.status === 204) {
+            // Success
+            if (window.JobStorage && JobStorage.deleteJob) JobStorage.deleteJob(idToDelete);
+            closeDelete();
             renderJobs(); // Refresh the list
           } else {
             alert('Failed to delete job. Please try again.');
+            btn.disabled = false;
+            btn.textContent = originalText;
+            btn.style.opacity = '1';
           }
         })
         .catch(err => {
           console.error('Error deleting job:', err);
           alert('Network error occurred while trying to delete.');
+          btn.disabled = false;
+          btn.textContent = originalText;
+          btn.style.opacity = '1';
         });
-      } else {
-        closeDelete();
       }
     });
+
+    function toggleJobStatus(jobId, currentStatus) {
+      var newStatus = currentStatus === 'Open' ? 'Closed' : 'Open';
+      var token = JobStorage.getToken();
+      
+      fetch('http://127.0.0.1:8000/api/jobs/' + jobId + '/', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to toggle status');
+        renderJobs();
+      })
+      .catch(err => {
+        console.error('Error toggling status:', err);
+        alert('Could not update job status.');
+      });
+    }
 
     function closeDelete() {
       deleteTarget = null;

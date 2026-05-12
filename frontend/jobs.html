@@ -30,8 +30,8 @@
     var container = document.getElementById('jobs-container');
     var countEl = document.getElementById('jobs-count');
 
-    // Fetch jobs from backend
-    fetch('http://127.0.0.1:8000/api/jobs/')
+    // Fetch jobs from backend (only open jobs)
+    fetch('http://127.0.0.1:8000/api/jobs/?status=Open')
       .then(response => response.json())
       .then(jobs => {
         /* Update count pill */
