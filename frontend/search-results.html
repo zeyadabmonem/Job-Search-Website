@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Results – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/search-results.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="page-wrapper">
+    <div class="container-900">
+
+      <!-- Back to search -->
+      <a href="search.html" class="back-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"
+             viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 12H5M12 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Search
+      </a>
+
+      <!-- Header -->
+      <div class="results-header">
+        <h2>Search Results</h2>
+        <span class="results-count" id="results-count">0 jobs found</span>
+      </div>
+
+      <!-- Cards injected by JS -->
+      <div id="results-container"></div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    var container = document.getElementById('results-container');
+    var countEl   = document.getElementById('results-count');
+
+    var params = new URLSearchParams(window.location.search);
+    params.set('status', 'Open');
+    var queryString = '?' + params.toString();
+
+    fetch('http://127.0.0.1:8000/api/jobs/' + queryString)
+      .then(response => response.json())
+      .then(results => {
+        /* Update count pill */
+        countEl.textContent = results.length + (results.length === 1 ? ' job found' : ' jobs found');
+
+        if (results.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">' +
+              '<div class="empty-state-icon"></div>' +
+              '<p>No jobs matched your search.</p>' +
+              '<p><a href="search.html">Try different filters</a> or <a href="jobs.html">browse all jobs</a>.</p>' +
+            '</div>';
+        } else {
+          results.forEach(function (job) {
+            var card = document.createElement('div');
+            card.className = 'job-card';
+            card.innerHTML =
+              '<div class="job-info">' +
+                '<h3>' + job.title + '</h3>' +
+                '<p class="job-meta">' +
+                  job.company + ' &nbsp;·&nbsp; $' + Number(job.salary).toLocaleString() + '/mo' +
+                  ' &nbsp;·&nbsp; ' + job.years + '+ yrs experience' +
+                '</p>' +
+                '<span class="badge badge-' + (job.status ? job.status.toLowerCase() : 'open') + '">' +
+                  '<span class="badge-dot"></span>' +
+                  (job.status && job.status.toLowerCase() === 'closed' ? 'Closed' : 'Open') +
+                '</span>' +
+              '</div>' +
+              '<button class="btn-view">View Details →</button>';
+
+            card.querySelector('.btn-view').addEventListener('click', function () {
+              window.location.href = 'job-details.html?id=' + job.id;
+            });
+
+            container.appendChild(card);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching search results:', error);
+        container.innerHTML = '<div class="empty-state"><p>Error loading search results. Ensure backend is running.</p></div>';
+      });
+  </script>
+
+</body>
+</html>
+
+
+
+

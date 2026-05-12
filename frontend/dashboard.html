@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/admin-dashboard.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="dashboard-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link active" target="_top">
+          <img src="assets/images/logo.png" alt="Dashboard" class="sidebar-icon" style="width:20px; height:20px;" /> Dashboard
+        </a>
+        <a href="job-manage.html" class="sidebar-link" target="_top">
+          <img src="assets/images/applied.png" alt="My Jobs" class="sidebar-icon" style="width:20px; height:20px;" /> My Jobs
+        </a>
+        <a href="job-create.html" class="sidebar-link" target="_top">
+          <img src="assets/images/add-job.png" alt="Add Job" class="sidebar-icon" style="width:20px; height:20px;" /> Add Job
+        </a>
+      </nav>
+      <button class="sidebar-link logout" onclick="if(window.JobStorage) JobStorage.logout(); else { window.top.location.href='login.html'; }">
+        <img src="assets/images/logout.png" alt="Logout" class="sidebar-icon" style="width:20px; height:20px;" /> Logout
+      </button>
+    </aside>
+
+    <!-- ── Main content ── -->
+    <main class="dashboard-main">
+
+      <!-- Page header -->
+      <div class="dashboard-header">
+        <div>
+          <h2>Admin Dashboard</h2>
+          <p>Manage your company listings</p>
+        </div>
+        <a href="job-create.html" class="btn btn-primary" target="_top">
+          + Add New Job
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+
+        <a href="job-manage.html" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;">
+          <div class="stat-card-top">
+            <span class="stat-label">Total Jobs</span>
+            <div class="stat-icon stat-icon-blue">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-total">0</div>
+        </a>
+
+        <a href="job-manage.html" class="stat-card" style="text-decoration:none; color:inherit; cursor:pointer;">
+          <div class="stat-card-top">
+            <span class="stat-label">Open Jobs</span>
+            <div class="stat-icon stat-icon-green">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-open">0</div>
+        </a>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-label">Total Applications</span>
+            <div class="stat-icon stat-icon-purple">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-apps">0</div>
+        </div>
+
+      </div>
+
+      <!-- Jobs table -->
+      <div class="table-card">
+
+        <div class="table-header">
+          <h3>Job Listings</h3>
+          <div class="table-search">
+            <span class="table-search-icon"></span>
+            <input type="text" id="table-search" placeholder="Search jobs…" autocomplete="off" />
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>Applicant</th>
+                <th>Job Title</th>
+                <th>Status</th>
+                <th style="text-align:right;">Applied Date</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="table-footer">
+          <span id="table-info">Showing 0 jobs</span>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    /* ── Fetch and Render Data ── */
+    function loadDashboardData() {
+      var token = JobStorage.getToken();
+      var user = JobStorage.getUser();
+      
+      if (!token || !user) {
+        window.top.location.href = 'login.html';
+        return;
+      }
+      if (user.role !== 'admin') {
+        window.top.location.href = 'index.html';
+        return;
+      }
+
+      fetch('http://127.0.0.1:8000/api/admin/dashboard/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch dashboard data');
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById('stat-total').textContent = data.total_jobs || 0;
+        document.getElementById('stat-open').textContent  = data.total_active_jobs || 0; 
+        document.getElementById('stat-apps').textContent  = data.total_applications;
+
+        /* Render Recent Applications Table */
+        renderApplicationsTable(data.latest_applications);
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error loading dashboard data.');
+      });
+    }
+
+    function renderApplicationsTable(apps) {
+      var tbody = document.getElementById('jobs-tbody');
+      tbody.innerHTML = '';
+
+      /* Update Table Header for Applications */
+      document.querySelector('.table-header h3').textContent = 'Recent Applications';
+      // Header is already set in HTML now
+
+      if (!apps || apps.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4"><div class="table-empty">No recent applications.</div></td></tr>';
+        document.getElementById('table-info').textContent = 'No applications';
+        return;
+      }
+
+      document.getElementById('table-info').textContent = 'Showing latest ' + apps.length + ' applications';
+
+      apps.forEach(function (app) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td><div class="job-cell-title">' + app.applicant_name + '</div></td>' +
+          '<td><div class="job-cell-meta">' + app.job_title + '</div></td>' +
+          '<td>' +
+            '<select style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; background:#fff; font-size:13px; font-weight:600; color:#334155; cursor:pointer;" onchange="updateAppStatus(' + app.id + ', this.value)">' +
+              '<option value="Pending" ' + (app.status === 'Pending' ? 'selected' : '') + '>Pending</option>' +
+              '<option value="Reviewed" ' + (app.status === 'Reviewed' ? 'selected' : '') + '>Reviewed</option>' +
+              '<option value="Interview" ' + (app.status === 'Interview' ? 'selected' : '') + '>Interview</option>' +
+              '<option value="Accepted" ' + (app.status === 'Accepted' ? 'selected' : '') + '>Accepted (Approved)</option>' +
+              '<option value="Rejected" ' + (app.status === 'Rejected' ? 'selected' : '') + '>Rejected</option>' +
+            '</select>' +
+          '</td>' +
+          '<td style="text-align:right; font-size:0.85rem; color:#64748b;">Just now</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.updateAppStatus = function(appId, newStatus) {
+      fetch('http://127.0.0.1:8000/api/admin/application/' + appId + '/status/', {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': 'Bearer ' + JobStorage.getToken(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to update status');
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Could not update status');
+        loadDashboardData(); // reload to reset dropdown
+      });
+    };
+
+    /* ── Init ── */
+    loadDashboardData();
+  </script>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Applications – JobFinder</title>
+  <link rel="stylesheet" href="assets/css/nav.css" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/applied-jobs.css" />
+</head>
+<body>
+
+  <iframe src="nav.html" class="navbar-frame" scrolling="no" title="Navigation"></iframe>
+
+  <div class="page-wrapper">
+    <div class="container-900">
+
+      <div class="page-header">
+        <h2>My Applications</h2>
+      </div>
+
+      <div id="applied-container"></div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/storage.js"></script>
+  <script>
+    var container = document.getElementById('applied-container');
+    var token = JobStorage.getToken();
+    var user = JobStorage.getUser();
+
+    if (!token || !user) {
+      window.top.location.href = 'login.html';
+    } else if (user.role === 'admin') {
+      window.top.location.href = 'dashboard.html';
+    } else {
+      fetch('http://127.0.0.1:8000/api/my-applications/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => res.json())
+      .then(apps => {
+        if (apps.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">' +
+              '<div class="empty-state-icon"></div>' +
+              '<p>No applications yet.</p>' +
+              '<p>Browse <a href="jobs.html">available jobs</a> and start applying.</p>' +
+            '</div>';
+        } 
+        else {
+          apps.forEach(function(app) {
+            var card = document.createElement('div');
+            card.className = 'app-card';
+
+            var d = new Date(app.applied_at);
+            var dateStr = 'Applied on ' + d.toLocaleDateString('en-US', {
+              year: 'numeric', month: 'short', day: 'numeric'
+            });
+
+            card.innerHTML =
+              '<div class="app-info">' +
+                '<h3>' + app.job_title + '</h3>' +
+                '<p class="app-meta">' + app.company + '</p>' +
+                '<p class="app-date">' + dateStr + '</p>' +
+              '</div>' +
+              '<span class="applied-tag">' + app.application_status + '</span>';
+
+            container.appendChild(card);
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        container.innerHTML = '<div class="empty-state"><p>Error loading applications.</p></div>';
+      });
+    }
+  </script>
+
+</body>
+</html>
+
+
+
