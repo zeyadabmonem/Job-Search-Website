@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'core',
+    'accounts',
+    'jobs',
+    'applications',
 ]
 
 MIDDLEWARE = [
@@ -124,7 +127,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
