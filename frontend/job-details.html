@@ -131,6 +131,15 @@
           badge.classList.add(job.status && job.status.toLowerCase() === 'open' ? 'badge-open' : 'badge-closed');
           text.textContent = job.status && job.status.toLowerCase() === 'open' ? 'Open' : 'Closed';
 
+          /* Check if job is closed */
+          if (job.status && job.status.toLowerCase() !== 'open') {
+            var btn = document.getElementById('apply-btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Job Closed';
+            btn.classList.add('btn-closed');
+            document.querySelector('.apply-note').textContent = 'This job listing is no longer accepting applications.';
+          }
+
           /* Requirements list */
           var list = document.getElementById('requirements-list');
           if (job.years) {

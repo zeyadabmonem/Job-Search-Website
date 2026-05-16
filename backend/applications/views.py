@@ -30,6 +30,12 @@ class ApplyAPIView(APIView):
         serializer = ApplySerializer(data=request.data)
         if serializer.is_valid():
             job = serializer.validated_data['job']
+            if job.status.lower() != 'open':
+                return Response(
+                    {"detail": "This job listing is closed and no longer accepting applications."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             if Application.objects.filter(seeker=request.user, job=job).exists():
                 return Response(
                     {"detail": "You have already applied for this job."}, 

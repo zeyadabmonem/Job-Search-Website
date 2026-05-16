@@ -192,6 +192,13 @@
   cursor: default !important;
 }
 
+/* Closed state for button */
+.btn-closed {
+  background: #64748b !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .job-hero { padding: 24px 20px; }
